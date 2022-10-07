@@ -7,9 +7,9 @@ mod prelude {
     pub use specs::prelude::*;
     pub use specs_derive::Component;
     pub use std::cmp::{max, min};
-    pub const _SCREEN_WIDTH: i32 = 80;
-    pub const _SCREEN_HEIGHT: i32 = 50;
-    pub const _MAPSIZE: i32 = _SCREEN_HEIGHT * _SCREEN_WIDTH;
+    pub const SCREEN_WIDTH: i32 = 80;
+    pub const SCREEN_HEIGHT: i32 = 50;
+    pub const MAPSIZE: i32 = SCREEN_WIDTH * SCREEN_HEIGHT;
     pub use crate::components::*;
     pub use crate::map::*;
 }
@@ -49,6 +49,10 @@ impl GameState for State {
 
         self.run_systems();
         player_input(self, ctx);
+
+        let map = self.ecs.fetch::<Vec<TileType>>();
+        draw_map(&map, ctx);
+
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
 
@@ -74,10 +78,14 @@ fn player_input(gs: &mut State, ctx: &mut BTerm) {
 fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
+    let map = ecs.fetch::<Vec<TileType>>();
 
     for (_player, pos) in (&mut players, &mut positions).join() {
-        pos.x = min(79, max(0, pos.x + delta_x));
-        pos.y = min(49, max(0, pos.y + delta_y));
+        let destination_idx = xy_idx(pos.x + delta_x, pos.y + delta_y);
+        if map[destination_idx] != TileType::Wall {
+            pos.x = min(79, max(0, pos.x + delta_x));
+            pos.y = min(49, max(0, pos.y + delta_y));
+        }
     }
 }
 
@@ -86,6 +94,7 @@ fn main() -> BError {
         .with_title("Feathers and Glass")
         .build()?;
     let mut gs = State { ecs: World::new() };
+    gs.ecs.insert(new_map());
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<LeftMover>();
