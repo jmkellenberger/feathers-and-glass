@@ -1,6 +1,6 @@
 use super::{
-    gamelog::GameLog, CombatStats, InBackpack, Name, Position, Potion, WantsToDrinkPotion,
-    WantsToDropItem, WantsToPickupItem,
+    gamelog::GameLog, CombatStats, Consumable, InBackpack, Name, Position, ProvidesHealing,
+    WantsToDropItem, WantsToPickupItem, WantsToUseItem,
 };
 use specs::prelude::*;
 
@@ -52,10 +52,11 @@ impl<'a> System<'a> for PotionUseSystem {
         ReadExpect<'a, Entity>,
         WriteExpect<'a, GameLog>,
         Entities<'a>,
-        WriteStorage<'a, WantsToDrinkPotion>,
+        WriteStorage<'a, WantsToUseItem>,
         ReadStorage<'a, Name>,
-        ReadStorage<'a, Potion>,
+        ReadStorage<'a, ProvidesHealing>,
         WriteStorage<'a, CombatStats>,
+        ReadStorage<'a, Consumable>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -63,31 +64,37 @@ impl<'a> System<'a> for PotionUseSystem {
             player_entity,
             mut gamelog,
             entities,
-            mut wants_drink,
+            mut wants_use,
             names,
-            potions,
+            healing,
             mut combat_stats,
+            consumables,
         ) = data;
 
-        for (entity, drink, stats) in (&entities, &wants_drink, &mut combat_stats).join() {
-            let potion = potions.get(drink.potion);
-            match potion {
+        for (entity, item, stats) in (&entities, &wants_use, &mut combat_stats).join() {
+            let item_heals = healing.get(item.item);
+            match item_heals {
                 None => {}
-                Some(potion) => {
-                    stats.hp = i32::min(stats.max_hp, stats.hp + potion.heal_amount);
+                Some(healer) => {
+                    stats.hp = i32::min(stats.max_hp, stats.hp + healer.heal_amount);
                     if entity == *player_entity {
                         gamelog.entries.push(format!(
-                            "You drink the {}, healing {} hp.",
-                            names.get(drink.potion).unwrap().name,
-                            potion.heal_amount
+                            "You drink the {} and heal {} hp.",
+                            names.get(item.item).unwrap().name,
+                            healer.heal_amount
                         ));
                     }
-                    entities.delete(drink.potion).expect("Delete failed");
+                }
+            }
+            let consumable = consumables.get(item.item);
+            match consumable {
+                None => {}
+                Some(_) => {
+                    entities.delete(item.item).expect("Delete Failed");
                 }
             }
         }
-
-        wants_drink.clear();
+        wants_use.clear();
     }
 }
 
