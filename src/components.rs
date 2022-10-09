@@ -1,4 +1,6 @@
-use crate::prelude::*;
+use rltk::RGB;
+use specs::prelude::*;
+use specs_derive::*;
 
 #[derive(Component)]
 pub struct Position {
@@ -8,12 +10,17 @@ pub struct Position {
 
 #[derive(Component)]
 pub struct Renderable {
-    pub glyph: FontCharType,
-    pub color: ColorPair,
+    pub glyph: rltk::FontCharType,
+    pub fg: RGB,
+    pub bg: RGB,
 }
 
 #[derive(Component, Debug)]
 pub struct Player {}
 
 #[derive(Component)]
-pub struct LeftMover {}
+pub struct Viewshed {
+    pub visible_tiles: Vec<rltk::Point>,
+    pub range: i32,
+    pub dirty: bool,
+}
