@@ -3,9 +3,9 @@ use rltk::{Algorithm2D, BaseMap, Point, RandomNumberGenerator, Rltk, RGB};
 use specs::prelude::*;
 use std::cmp::{max, min};
 
-const MAPWIDTH: usize = 80;
-const MAPHEIGHT: usize = 43;
-const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
+pub const MAPWIDTH: usize = 80;
+pub const MAPHEIGHT: usize = 43;
+pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileType {
@@ -28,26 +28,6 @@ pub struct Map {
 impl Map {
     pub fn xy_idx(&self, x: i32, y: i32) -> usize {
         (y as usize * self.width as usize) + x as usize
-    }
-
-    pub fn populate_blocked(&mut self) {
-        for (i, tile) in self.tiles.iter_mut().enumerate() {
-            self.blocked[i] = *tile == TileType::Wall;
-        }
-    }
-
-    fn is_exit_valid(&self, x: i32, y: i32) -> bool {
-        if x < 1 || x > self.width - 1 || y < 1 || y > self.height - 1 {
-            return false;
-        }
-        let idx = self.xy_idx(x, y);
-        !self.blocked[idx]
-    }
-
-    pub fn clear_content_index(&mut self) {
-        for content in self.tile_content.iter_mut() {
-            content.clear();
-        }
     }
 
     fn apply_room_to_map(&mut self, room: &Rect) {
@@ -74,6 +54,26 @@ impl Map {
             if idx > 0 && idx < self.width as usize * self.height as usize {
                 self.tiles[idx as usize] = TileType::Floor;
             }
+        }
+    }
+
+    fn is_exit_valid(&self, x: i32, y: i32) -> bool {
+        if x < 1 || x > self.width - 1 || y < 1 || y > self.height - 1 {
+            return false;
+        }
+        let idx = self.xy_idx(x, y);
+        !self.blocked[idx]
+    }
+
+    pub fn populate_blocked(&mut self) {
+        for (i, tile) in self.tiles.iter_mut().enumerate() {
+            self.blocked[i] = *tile == TileType::Wall;
+        }
+    }
+
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
         }
     }
 
@@ -150,13 +150,12 @@ impl BaseMap for Map {
         let y = idx as i32 / self.width;
         let w = self.width as usize;
 
-        // Cardinal Directions
-
+        // Cardinal directions
         if self.is_exit_valid(x - 1, y) {
             exits.push((idx - 1, 1.0))
         };
         if self.is_exit_valid(x + 1, y) {
-            exits.push((idx - 1, 1.0))
+            exits.push((idx + 1, 1.0))
         };
         if self.is_exit_valid(x, y - 1) {
             exits.push((idx - w, 1.0))
@@ -218,7 +217,7 @@ pub fn draw_map(ecs: &World, ctx: &mut Rltk) {
 
         // Move the coordinates
         x += 1;
-        if x > 79 {
+        if x > MAPWIDTH as i32 - 1 {
             x = 0;
             y += 1;
         }
