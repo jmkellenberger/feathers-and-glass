@@ -1,9 +1,9 @@
 use crate::InflictsDamage;
 
 use super::{
-    gamelog::GameLog, AreaOfEffect, CombatStats, Confusion, Consumable, Equippable, Equipped,
-    InBackpack, Map, Name, Position, ProvidesHealing, SufferDamage, WantsToDropItem,
-    WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
+    gamelog::GameLog, particle_system::ParticleBuilder, AreaOfEffect, CombatStats, Confusion,
+    Consumable, Equippable, Equipped, InBackpack, Map, Name, Position, ProvidesHealing,
+    SufferDamage, WantsToDropItem, WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
 };
 use specs::prelude::*;
 
@@ -52,44 +52,48 @@ pub struct ItemUseSystem {}
 impl<'a> System<'a> for ItemUseSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        ReadExpect<'a, Map>,
         ReadExpect<'a, Entity>,
         WriteExpect<'a, GameLog>,
+        ReadExpect<'a, Map>,
         Entities<'a>,
         WriteStorage<'a, WantsToUseItem>,
         ReadStorage<'a, Name>,
-        ReadStorage<'a, ProvidesHealing>,
-        WriteStorage<'a, CombatStats>,
         ReadStorage<'a, Consumable>,
-        WriteStorage<'a, SufferDamage>,
+        ReadStorage<'a, ProvidesHealing>,
         ReadStorage<'a, InflictsDamage>,
+        WriteStorage<'a, CombatStats>,
+        WriteStorage<'a, SufferDamage>,
         ReadStorage<'a, AreaOfEffect>,
         WriteStorage<'a, Confusion>,
         ReadStorage<'a, Equippable>,
         WriteStorage<'a, Equipped>,
         WriteStorage<'a, InBackpack>,
+        WriteExpect<'a, ParticleBuilder>,
+        ReadStorage<'a, Position>,
     );
 
+    #[allow(clippy::cognitive_complexity)]
     fn run(&mut self, data: Self::SystemData) {
         let (
-            map,
             player_entity,
             mut gamelog,
+            map,
             entities,
             mut wants_use,
             names,
-            healing,
-            mut combat_stats,
             consumables,
-            mut suffer_damage,
+            healing,
             inflict_damage,
+            mut combat_stats,
+            mut suffer_damage,
             aoe,
             mut confused,
             equippable,
             mut equipped,
             mut backpack,
+            mut particle_builder,
+            positions,
         ) = data;
-
         for (entity, use_item) in (&entities, &wants_use).join() {
             let mut used_item = true;
 
@@ -119,6 +123,14 @@ impl<'a> System<'a> for ItemUseSystem {
                                 for mob in map.tile_content[idx].iter() {
                                     targets.push(*mob);
                                 }
+                                particle_builder.request(
+                                    tile_idx.x,
+                                    tile_idx.y,
+                                    rltk::RGB::named(rltk::ORANGE),
+                                    rltk::RGB::named(rltk::BLACK),
+                                    rltk::to_cp437('░'),
+                                    200.0,
+                                );
                             }
                         }
                     }
@@ -189,6 +201,18 @@ impl<'a> System<'a> for ItemUseSystem {
                                 ));
                             }
                             used_item = true;
+
+                            let pos = positions.get(*target);
+                            if let Some(pos) = pos {
+                                particle_builder.request(
+                                    pos.x,
+                                    pos.y,
+                                    rltk::RGB::named(rltk::GREEN),
+                                    rltk::RGB::named(rltk::BLACK),
+                                    rltk::to_cp437('♥'),
+                                    200.0,
+                                );
+                            }
                         }
                     }
                 }
@@ -208,6 +232,18 @@ impl<'a> System<'a> for ItemUseSystem {
                                 "You use {} on {}, inflicting {} hp.",
                                 item_name.name, mob_name.name, damage.damage
                             ));
+
+                            let pos = positions.get(*mob);
+                            if let Some(pos) = pos {
+                                particle_builder.request(
+                                    pos.x,
+                                    pos.y,
+                                    rltk::RGB::named(rltk::RED),
+                                    rltk::RGB::named(rltk::BLACK),
+                                    rltk::to_cp437('‼'),
+                                    200.0,
+                                );
+                            }
                         }
 
                         used_item = true;
@@ -232,6 +268,18 @@ impl<'a> System<'a> for ItemUseSystem {
                                     "You use {} on {}, confusing them.",
                                     item_name.name, mob_name.name
                                 ));
+
+                                let pos = positions.get(*mob);
+                                if let Some(pos) = pos {
+                                    particle_builder.request(
+                                        pos.x,
+                                        pos.y,
+                                        rltk::RGB::named(rltk::MAGENTA),
+                                        rltk::RGB::named(rltk::BLACK),
+                                        rltk::to_cp437('?'),
+                                        200.0,
+                                    );
+                                }
                             }
                         }
                     }
