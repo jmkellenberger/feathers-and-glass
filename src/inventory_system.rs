@@ -1,9 +1,8 @@
-use crate::InflictsDamage;
-
 use super::{
     gamelog::GameLog, particle_system::ParticleBuilder, AreaOfEffect, CombatStats, Confusion,
-    Consumable, Equippable, Equipped, InBackpack, Map, Name, Position, ProvidesHealing,
-    SufferDamage, WantsToDropItem, WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
+    Consumable, Equippable, Equipped, HungerClock, HungerState, InBackpack, InflictsDamage, Map,
+    Name, Position, ProvidesFood, ProvidesHealing, SufferDamage, WantsToDropItem,
+    WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
 };
 use specs::prelude::*;
 
@@ -70,6 +69,8 @@ impl<'a> System<'a> for ItemUseSystem {
         WriteStorage<'a, InBackpack>,
         WriteExpect<'a, ParticleBuilder>,
         ReadStorage<'a, Position>,
+        ReadStorage<'a, ProvidesFood>,
+        WriteStorage<'a, HungerClock>,
     );
 
     #[allow(clippy::cognitive_complexity)]
@@ -93,6 +94,8 @@ impl<'a> System<'a> for ItemUseSystem {
             mut backpack,
             mut particle_builder,
             positions,
+            provides_food,
+            mut hunger_clocks,
         ) = data;
         for (entity, use_item) in (&entities, &wants_use).join() {
             let mut used_item = true;
@@ -179,6 +182,24 @@ impl<'a> System<'a> for ItemUseSystem {
                     if target == *player_entity {
                         gamelog.entries.push(format!(
                             "You equip {}.",
+                            names.get(use_item.item).unwrap().name
+                        ));
+                    }
+                }
+            }
+
+            let item_edible = provides_food.get(use_item.item);
+            match item_edible {
+                None => {}
+                Some(_) => {
+                    used_item = true;
+                    let target = targets[0];
+                    let hc = hunger_clocks.get_mut(target);
+                    if let Some(hc) = hc {
+                        hc.state = HungerState::WellFed;
+                        hc.duration = 20;
+                        gamelog.entries.push(format!(
+                            "You eat the {}",
                             names.get(use_item.item).unwrap().name
                         ));
                     }
