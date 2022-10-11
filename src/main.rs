@@ -28,6 +28,7 @@ use inventory_system::{ItemCollectionSystem, ItemDropSystem, ItemRemoveSystem, I
 mod hunger_system;
 mod particle_system;
 mod random_table;
+mod rex_assets;
 mod saveload_system;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -499,6 +500,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(RunState::MainMenu {
         menu_selection: gui::MainMenuSelection::NewGame,
     });
+    gs.ecs.insert(rex_assets::RexAssets::new());
     gs.ecs.insert(gamelog::GameLog {
         entries: vec!["Welcome to Feathers and Glass".to_string()],
     });
