@@ -426,7 +426,7 @@ impl GameState for State {
                 newrunstate = RunState::PreRun;
             }
             RunState::GameOver => {
-                let result = gui::game_over(ctx);
+                let result = gui::game_over(self, ctx);
                 match result {
                     gui::GameOverResult::NoSelection => {}
                     gui::GameOverResult::QuitToMenu => {

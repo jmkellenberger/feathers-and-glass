@@ -526,7 +526,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
     let save_exists = super::saveload_system::does_save_exist();
     let runstate = gs.ecs.fetch::<RunState>();
     let assets = gs.ecs.fetch::<RexAssets>();
-    ctx.render_xp_sprite(&assets.menu, 0, 0);
+    ctx.render_xp_sprite(&assets.main_menu, 0, 0);
 
     ctx.print_color(
         2,
@@ -672,35 +672,41 @@ pub enum GameOverResult {
     QuitToMenu,
 }
 
-pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
-    ctx.print_color_centered(
-        15,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "Your journey has ended!",
-    );
-    ctx.print_color_centered(
-        17,
-        RGB::named(rltk::WHITE),
-        RGB::named(rltk::BLACK),
-        "One day, we'll tell you all about how you did.",
-    );
-    ctx.print_color_centered(
-        18,
-        RGB::named(rltk::WHITE),
-        RGB::named(rltk::BLACK),
-        "That day, sadly, is not in this chapter..",
-    );
+pub fn game_over(gs: &mut State, ctx: &mut Rltk) -> GameOverResult {
+    let assets = gs.ecs.fetch::<RexAssets>();
+    ctx.render_xp_sprite(&assets.game_over, 0, 0);
 
     ctx.print_color_centered(
         20,
+        RGB::named(rltk::RED),
+        RGB::named(rltk::BLACK),
+        "You have unravelled and your Skein is ended",
+    );
+    ctx.print_color_centered(
+        22,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "One day, the Weaver of Fates will pass her judgement here",
+    );
+    ctx.print_color_centered(
+        23,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "The Weaver of Fates, sadly, has not been implemented yet..",
+    );
+
+    ctx.print_color_centered(
+        25,
         RGB::named(rltk::MAGENTA),
         RGB::named(rltk::BLACK),
-        "Press any key to return to the menu.",
+        "Press ESCAPE to return to the menu.",
     );
 
     match ctx.key {
         None => GameOverResult::NoSelection,
-        Some(_) => GameOverResult::QuitToMenu,
+        Some(key) => match key {
+            VirtualKeyCode::Escape => GameOverResult::QuitToMenu,
+            _ => GameOverResult::NoSelection,
+        },
     }
 }
