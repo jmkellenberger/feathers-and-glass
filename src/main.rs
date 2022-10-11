@@ -80,28 +80,25 @@ impl GameState for State {
 
         match newrunstate {
             RunState::MainMenu { .. } => {}
+            RunState::GameOver { .. } => {}
             _ => {
                 draw_map(&self.ecs.fetch::<Map>(), ctx);
+                let positions = self.ecs.read_storage::<Position>();
+                let renderables = self.ecs.read_storage::<Renderable>();
+                let hidden = self.ecs.read_storage::<Hidden>();
+                let map = self.ecs.fetch::<Map>();
 
-                {
-                    let positions = self.ecs.read_storage::<Position>();
-                    let renderables = self.ecs.read_storage::<Renderable>();
-                    let map = self.ecs.fetch::<Map>();
-                    let hidden = self.ecs.read_storage::<Hidden>();
-
-                    let mut data = (&positions, &renderables, !&hidden)
-                        .join()
-                        .collect::<Vec<_>>();
-                    data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
-                    for (pos, render, _hidden) in data.iter() {
-                        let idx = map.xy_idx(pos.x, pos.y);
-                        if map.visible_tiles[idx] {
-                            ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph)
-                        }
+                let mut data = (&positions, &renderables, !&hidden)
+                    .join()
+                    .collect::<Vec<_>>();
+                data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
+                for (pos, render, _hidden) in data.iter() {
+                    let idx = map.xy_idx(pos.x, pos.y);
+                    if map.visible_tiles[idx] {
+                        ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph)
                     }
-
-                    gui::draw_ui(&self.ecs, ctx);
                 }
+                gui::draw_ui(&self.ecs, ctx);
             }
         }
 
@@ -122,27 +119,6 @@ impl GameState for State {
                     }
                 }
             }
-            RunState::MainMenu { .. } => {
-                let result = gui::main_menu(self, ctx);
-                match result {
-                    gui::MainMenuResult::NoSelection { selected } => {
-                        newrunstate = RunState::MainMenu {
-                            menu_selection: selected,
-                        }
-                    }
-                    gui::MainMenuResult::Selected { selected } => match selected {
-                        gui::MainMenuSelection::NewGame => newrunstate = RunState::PreRun,
-                        gui::MainMenuSelection::LoadGame => {
-                            saveload_system::load_game(&mut self.ecs);
-                            newrunstate = RunState::AwaitingInput;
-                            saveload_system::delete_save();
-                        }
-                        gui::MainMenuSelection::Quit => {
-                            ::std::process::exit(0);
-                        }
-                    },
-                }
-            }
             RunState::PreRun => {
                 self.run_systems();
                 self.ecs.maintain();
@@ -151,7 +127,6 @@ impl GameState for State {
             RunState::AwaitingInput => {
                 newrunstate = player_input(self, ctx);
             }
-
             RunState::PlayerTurn => {
                 self.run_systems();
                 self.ecs.maintain();
@@ -162,20 +137,6 @@ impl GameState for State {
                     _ => newrunstate = RunState::MonsterTurn,
                 }
             }
-
-            RunState::MagicMapReveal { row } => {
-                let mut map = self.ecs.fetch_mut::<Map>();
-                for x in 0..MAPWIDTH {
-                    let idx = map.xy_idx(x as i32, row);
-                    map.revealed_tiles[idx] = true;
-                }
-                if row as usize == MAPHEIGHT - 1 {
-                    newrunstate = RunState::MonsterTurn;
-                } else {
-                    newrunstate = RunState::MagicMapReveal { row: row + 1 };
-                }
-            }
-
             RunState::MonsterTurn => {
                 self.run_systems();
                 self.ecs.maintain();
@@ -229,7 +190,6 @@ impl GameState for State {
                     }
                 }
             }
-
             RunState::ShowRemoveItem => {
                 let result = gui::remove_item_menu(self, ctx);
                 match result.0 {
@@ -268,6 +228,40 @@ impl GameState for State {
                     }
                 }
             }
+            RunState::MainMenu { .. } => {
+                let result = gui::main_menu(self, ctx);
+                match result {
+                    gui::MainMenuResult::NoSelection { selected } => {
+                        newrunstate = RunState::MainMenu {
+                            menu_selection: selected,
+                        }
+                    }
+                    gui::MainMenuResult::Selected { selected } => match selected {
+                        gui::MainMenuSelection::NewGame => newrunstate = RunState::PreRun,
+                        gui::MainMenuSelection::LoadGame => {
+                            saveload_system::load_game(&mut self.ecs);
+                            newrunstate = RunState::AwaitingInput;
+                            saveload_system::delete_save();
+                        }
+                        gui::MainMenuSelection::Quit => {
+                            ::std::process::exit(0);
+                        }
+                    },
+                }
+            }
+            RunState::GameOver => {
+                let result = gui::game_over(self, ctx);
+                match result {
+                    gui::GameOverResult::NoSelection => {}
+                    gui::GameOverResult::QuitToMenu => {
+                        self.game_over_cleanup();
+                        newrunstate = RunState::MapGeneration;
+                        self.mapgen_next_state = Some(RunState::MainMenu {
+                            menu_selection: gui::MainMenuSelection::NewGame,
+                        });
+                    }
+                }
+            }
             RunState::SaveGame => {
                 saveload_system::save_game(&mut self.ecs);
                 newrunstate = RunState::MainMenu {
@@ -276,18 +270,19 @@ impl GameState for State {
             }
             RunState::NextLevel => {
                 self.goto_next_level();
-                newrunstate = RunState::PreRun;
+                self.mapgen_next_state = Some(RunState::PreRun);
+                newrunstate = RunState::MapGeneration;
             }
-            RunState::GameOver => {
-                let result = gui::game_over(self, ctx);
-                match result {
-                    gui::GameOverResult::NoSelection => {}
-                    gui::GameOverResult::QuitToMenu => {
-                        self.game_over_cleanup();
-                        newrunstate = RunState::MainMenu {
-                            menu_selection: gui::MainMenuSelection::NewGame,
-                        };
-                    }
+            RunState::MagicMapReveal { row } => {
+                let mut map = self.ecs.fetch_mut::<Map>();
+                for x in 0..MAPWIDTH {
+                    let idx = map.xy_idx(x as i32, row);
+                    map.revealed_tiles[idx] = true;
+                }
+                if row as usize == MAPHEIGHT - 1 {
+                    newrunstate = RunState::MonsterTurn;
+                } else {
+                    newrunstate = RunState::MagicMapReveal { row: row + 1 };
                 }
             }
         }
