@@ -79,7 +79,8 @@ pub fn save_game(ecs: &mut World) {
             MagicMapper,
             Hidden,
             EntryTrigger,
-            EntityMoved
+            EntityMoved,
+            MovesRandomly
         );
     }
 
@@ -163,7 +164,8 @@ pub fn load_game(ecs: &mut World) {
             MagicMapper,
             Hidden,
             EntryTrigger,
-            EntityMoved
+            EntityMoved,
+            MovesRandomly
         );
     }
 

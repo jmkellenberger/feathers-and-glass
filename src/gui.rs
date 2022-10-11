@@ -559,7 +559,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
         48,
         RGB::named(rltk::GREY),
         RGB::named(rltk::BLACK),
-        "AAMIDAL GAMES",
+        "AAMIDAL",
     );
 
     let mut y = 43;
