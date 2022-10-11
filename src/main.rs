@@ -109,6 +109,7 @@ impl GameState for State {
                 }
                 ctx.cls();
                 draw_map(&self.mapgen_history[self.mapgen_index], ctx);
+                gui::draw_mapgen(ctx);
 
                 self.mapgen_timer += ctx.frame_time_ms;
                 if self.mapgen_timer > 300.0 {

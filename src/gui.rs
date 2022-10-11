@@ -5,6 +5,24 @@ use super::{
 use rltk::{Point, Rltk, VirtualKeyCode, RGB};
 use specs::prelude::*;
 
+pub fn draw_mapgen(ctx: &mut Rltk) {
+    ctx.draw_box(
+        0,
+        43,
+        79,
+        6,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+    );
+
+    ctx.print_color_centered(
+        46,
+        RGB::named(rltk::YELLOW),
+        RGB::named(rltk::BLACK),
+        "Generating map...",
+    )
+}
+
 pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     ctx.draw_box(
         0,
@@ -541,7 +559,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
         48,
         RGB::named(rltk::GREY),
         RGB::named(rltk::BLACK),
-        "3SIS GAMES",
+        "AAMIDAL GAMES",
     );
 
     let mut y = 43;
