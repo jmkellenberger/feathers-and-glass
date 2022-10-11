@@ -443,6 +443,11 @@ impl State {
             self.ecs.delete_entity(*del).expect("Deletion failed");
         }
 
+        {
+            let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
+            gamelog.entries = vec!["Welcome to Feathers and Glass".to_string()]
+        }
+
         // Spawn a new player
         {
             let player_entity = spawner::player(&mut self.ecs, 0, 0);
