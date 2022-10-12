@@ -22,6 +22,10 @@ impl MapBuilder for SimpleMapBuilder {
         self.starting_position.clone()
     }
 
+    fn get_snapshot_history(&self) -> Vec<Map> {
+        self.history.clone()
+    }
+
     fn build_map(&mut self) {
         self.rooms_and_corridors();
     }
@@ -30,10 +34,6 @@ impl MapBuilder for SimpleMapBuilder {
         for room in self.rooms.iter().skip(1) {
             spawner::spawn_room(ecs, room, self.depth);
         }
-    }
-
-    fn get_snapshot_history(&self) -> Vec<Map> {
-        self.history.clone()
     }
 
     fn take_snapshot(&mut self) {

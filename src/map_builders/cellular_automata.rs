@@ -1,6 +1,6 @@
 use super::{
-    common::{generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant},
-    spawner, Map, MapBuilder, Position, TileType, SHOW_MAPGEN_VISUALIZER,
+    generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant, spawner, Map,
+    MapBuilder, Position, TileType, SHOW_MAPGEN_VISUALIZER,
 };
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
@@ -28,11 +28,13 @@ impl MapBuilder for CellularAutomataBuilder {
     }
 
     fn build_map(&mut self) {
-        self.build()
+        self.build();
     }
 
     fn spawn_entities(&mut self, ecs: &mut World) {
-        self.spawn_entities(ecs)
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(ecs, area.1, self.depth);
+        }
     }
 
     fn take_snapshot(&mut self) {
@@ -56,6 +58,8 @@ impl CellularAutomataBuilder {
             noise_areas: HashMap::new(),
         }
     }
+
+    #[allow(clippy::map_entry)]
     fn build(&mut self) {
         let mut rng = RandomNumberGenerator::new();
 
@@ -71,7 +75,9 @@ impl CellularAutomataBuilder {
                 }
             }
         }
-        self.take_snapshot(); // Now we iteratively apply cellular automata rules
+        self.take_snapshot();
+
+        // Now we iteratively apply cellular automata rules
         for _i in 0..15 {
             let mut newtiles = self.map.tiles.clone();
 
@@ -130,20 +136,17 @@ impl CellularAutomataBuilder {
                 .map
                 .xy_idx(self.starting_position.x, self.starting_position.y);
         }
+        self.take_snapshot();
 
+        // Find all tiles we can reach from the starting point
         let exit_tile = remove_unreachable_areas_returning_most_distant(&mut self.map, start_idx);
         self.take_snapshot();
 
+        // Place the stairs
         self.map.tiles[exit_tile] = TileType::DownStairs;
         self.take_snapshot();
 
         // Now we build a noise map for use in spawning entities later
-        self.noise_areas = generate_voronoi_spawn_regions(&mut self.map, &mut rng)
-    }
-
-    fn spawn_entities(&mut self, ecs: &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1, self.depth);
-        }
+        self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
     }
 }
