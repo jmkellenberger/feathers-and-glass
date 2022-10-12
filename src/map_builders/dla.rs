@@ -3,10 +3,10 @@ use super::{
     spawner, Map, MapBuilder, Position, Symmetry, TileType, SHOW_MAPGEN_VISUALIZER,
 };
 use rltk::RandomNumberGenerator;
-use specs::prelude::*;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Copy, Clone)]
+#[allow(dead_code)]
 pub enum DLAAlgorithm {
     WalkInwards,
     WalkOutwards,
@@ -23,6 +23,7 @@ pub struct DLABuilder {
     brush_size: i32,
     symmetry: Symmetry,
     floor_percent: f32,
+    spawn_list: Vec<(usize, String)>,
 }
 
 impl MapBuilder for DLABuilder {
@@ -42,10 +43,8 @@ impl MapBuilder for DLABuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1, self.depth);
-        }
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
     }
 
     fn take_snapshot(&mut self) {
@@ -72,9 +71,11 @@ impl DLABuilder {
             brush_size: 2,
             symmetry: Symmetry::None,
             floor_percent: 0.25,
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn walk_inwards(new_depth: i32) -> DLABuilder {
         DLABuilder {
             map: Map::new(new_depth),
@@ -86,9 +87,11 @@ impl DLABuilder {
             brush_size: 1,
             symmetry: Symmetry::None,
             floor_percent: 0.25,
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn walk_outwards(new_depth: i32) -> DLABuilder {
         DLABuilder {
             map: Map::new(new_depth),
@@ -100,9 +103,11 @@ impl DLABuilder {
             brush_size: 2,
             symmetry: Symmetry::None,
             floor_percent: 0.25,
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn central_attractor(new_depth: i32) -> DLABuilder {
         DLABuilder {
             map: Map::new(new_depth),
@@ -114,9 +119,11 @@ impl DLABuilder {
             brush_size: 2,
             symmetry: Symmetry::None,
             floor_percent: 0.25,
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn insectoid(new_depth: i32) -> DLABuilder {
         DLABuilder {
             map: Map::new(new_depth),
@@ -128,6 +135,7 @@ impl DLABuilder {
             brush_size: 2,
             symmetry: Symmetry::Horizontal,
             floor_percent: 0.25,
+            spawn_list: Vec::new(),
         }
     }
 
@@ -294,5 +302,16 @@ impl DLABuilder {
 
         // Now we build a noise map for use in spawning entities later
         self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
+
+        // Spawn the entities
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(
+                &self.map,
+                &mut rng,
+                area.1,
+                self.depth,
+                &mut self.spawn_list,
+            );
+        }
     }
 }

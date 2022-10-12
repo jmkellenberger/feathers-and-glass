@@ -3,10 +3,10 @@ use super::{
     spawner, Map, MapBuilder, Position, Symmetry, TileType, SHOW_MAPGEN_VISUALIZER,
 };
 use rltk::RandomNumberGenerator;
-use specs::prelude::*;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Copy, Clone)]
+#[allow(dead_code)]
 pub enum DrunkSpawnMode {
     StartingPoint,
     Random,
@@ -27,6 +27,7 @@ pub struct DrunkardsWalkBuilder {
     history: Vec<Map>,
     noise_areas: HashMap<i32, Vec<usize>>,
     settings: DrunkardSettings,
+    spawn_list: Vec<(usize, String)>,
 }
 
 impl MapBuilder for DrunkardsWalkBuilder {
@@ -46,10 +47,8 @@ impl MapBuilder for DrunkardsWalkBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1, self.depth);
-        }
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
     }
 
     fn take_snapshot(&mut self) {
@@ -73,9 +72,11 @@ impl DrunkardsWalkBuilder {
             history: Vec::new(),
             noise_areas: HashMap::new(),
             settings,
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn open_area(new_depth: i32) -> DrunkardsWalkBuilder {
         DrunkardsWalkBuilder {
             map: Map::new(new_depth),
@@ -90,9 +91,11 @@ impl DrunkardsWalkBuilder {
                 brush_size: 1,
                 symmetry: Symmetry::None,
             },
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn open_halls(new_depth: i32) -> DrunkardsWalkBuilder {
         DrunkardsWalkBuilder {
             map: Map::new(new_depth),
@@ -107,9 +110,11 @@ impl DrunkardsWalkBuilder {
                 brush_size: 1,
                 symmetry: Symmetry::None,
             },
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn winding_passages(new_depth: i32) -> DrunkardsWalkBuilder {
         DrunkardsWalkBuilder {
             map: Map::new(new_depth),
@@ -124,9 +129,11 @@ impl DrunkardsWalkBuilder {
                 brush_size: 1,
                 symmetry: Symmetry::None,
             },
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn fat_passages(new_depth: i32) -> DrunkardsWalkBuilder {
         DrunkardsWalkBuilder {
             map: Map::new(new_depth),
@@ -141,9 +148,11 @@ impl DrunkardsWalkBuilder {
                 brush_size: 2,
                 symmetry: Symmetry::None,
             },
+            spawn_list: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn fearful_symmetry(new_depth: i32) -> DrunkardsWalkBuilder {
         DrunkardsWalkBuilder {
             map: Map::new(new_depth),
@@ -158,6 +167,7 @@ impl DrunkardsWalkBuilder {
                 brush_size: 1,
                 symmetry: Symmetry::Both,
             },
+            spawn_list: Vec::new(),
         }
     }
 
@@ -278,5 +288,16 @@ impl DrunkardsWalkBuilder {
 
         // Now we build a noise map for use in spawning entities later
         self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
+
+        // Spawn the entities
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(
+                &self.map,
+                &mut rng,
+                area.1,
+                self.depth,
+                &mut self.spawn_list,
+            );
+        }
     }
 }

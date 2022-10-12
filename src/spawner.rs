@@ -5,7 +5,6 @@ use super::{
     Position, ProvidesFood, ProvidesHealing, Ranged, Rect, Renderable, SerializeMe,
     SingleActivation, TileType, Viewshed,
 };
-
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
@@ -20,7 +19,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         })
         .with(Renderable {
             glyph: rltk::to_cp437('@'),
-            fg: RGB::named(rltk::GOLD),
+            fg: RGB::named(rltk::YELLOW),
             bg: RGB::named(rltk::BLACK),
             render_order: 0,
         })
@@ -66,11 +65,17 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Bear Trap", 5)
 }
 
-pub fn spawn_room(ecs: &mut World, room: &Rect, map_depth: i32) {
+/// Fills a room with stuff!
+pub fn spawn_room(
+    map: &Map,
+    rng: &mut RandomNumberGenerator,
+    room: &Rect,
+    map_depth: i32,
+    spawn_list: &mut Vec<(usize, String)>,
+) {
     let mut possible_targets: Vec<usize> = Vec::new();
     {
         // Borrow scope - to keep access to the map separated
-        let map = ecs.fetch::<Map>();
         for y in room.y1 + 1..room.y2 {
             for x in room.x1 + 1..room.x2 {
                 let idx = map.xy_idx(x, y);
@@ -81,18 +86,23 @@ pub fn spawn_room(ecs: &mut World, room: &Rect, map_depth: i32) {
         }
     }
 
-    spawn_region(ecs, &possible_targets, map_depth);
+    spawn_region(map, rng, &possible_targets, map_depth, spawn_list);
 }
 
-#[allow(clippy::map_entry)]
-pub fn spawn_region(ecs: &mut World, area: &[usize], map_depth: i32) {
+/// Fills a region with stuff!
+pub fn spawn_region(
+    _map: &Map,
+    rng: &mut RandomNumberGenerator,
+    area: &[usize],
+    map_depth: i32,
+    spawn_list: &mut Vec<(usize, String)>,
+) {
     let spawn_table = room_table(map_depth);
     let mut spawn_points: HashMap<usize, String> = HashMap::new();
     let mut areas: Vec<usize> = Vec::from(area);
 
     // Scope to keep the borrow checker happy
     {
-        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
         let num_spawns = i32::min(
             areas.len() as i32,
             rng.roll_dice(1, MAX_MONSTERS + 3) + (map_depth - 1) - 3,
@@ -107,19 +117,21 @@ pub fn spawn_region(ecs: &mut World, area: &[usize], map_depth: i32) {
             } else {
                 (rng.roll_dice(1, areas.len() as i32) - 1) as usize
             };
+
             let map_idx = areas[array_index];
-            spawn_points.insert(map_idx, spawn_table.roll(&mut rng));
+            spawn_points.insert(map_idx, spawn_table.roll(rng));
             areas.remove(array_index);
         }
     }
 
     // Actually spawn the monsters
     for spawn in spawn_points.iter() {
-        spawn_entity(ecs, &spawn);
+        spawn_list.push((*spawn.0, spawn.1.to_string()));
     }
 }
 
-fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
+/// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
+pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
     let x = (*spawn.0 % MAPWIDTH) as i32;
     let y = (*spawn.0 / MAPWIDTH) as i32;
 
@@ -140,11 +152,12 @@ fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
         _ => {}
     }
 }
+
 fn tamasic(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('t'), "Tamasic Man");
+    monster(ecs, x, y, rltk::to_cp437('o'), "Tamasic");
 }
 fn foogi(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('f'), "Foogi");
+    monster(ecs, x, y, rltk::to_cp437('g'), "Foogi");
 }
 
 fn monster<S: ToString>(ecs: &mut World, x: i32, y: i32, glyph: rltk::FontCharType, name: S) {
@@ -200,7 +213,7 @@ fn magic_missile_scroll(ecs: &mut World, x: i32, y: i32) {
         .with(Position { x, y })
         .with(Renderable {
             glyph: rltk::to_cp437(')'),
-            fg: RGB::named(rltk::MAGENTA),
+            fg: RGB::named(rltk::CYAN),
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
@@ -210,7 +223,7 @@ fn magic_missile_scroll(ecs: &mut World, x: i32, y: i32) {
         .with(Item {})
         .with(Consumable {})
         .with(Ranged { range: 6 })
-        .with(InflictsDamage { damage: 6 })
+        .with(InflictsDamage { damage: 20 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }
@@ -220,7 +233,7 @@ fn fireball_scroll(ecs: &mut World, x: i32, y: i32) {
         .with(Position { x, y })
         .with(Renderable {
             glyph: rltk::to_cp437(')'),
-            fg: RGB::named(rltk::MAGENTA),
+            fg: RGB::named(rltk::ORANGE),
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
@@ -241,7 +254,7 @@ fn confusion_scroll(ecs: &mut World, x: i32, y: i32) {
         .with(Position { x, y })
         .with(Renderable {
             glyph: rltk::to_cp437(')'),
-            fg: RGB::named(rltk::MAGENTA),
+            fg: RGB::named(rltk::PINK),
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
@@ -353,8 +366,8 @@ fn rations(ecs: &mut World, x: i32, y: i32) {
             name: "Rations".to_string(),
         })
         .with(Item {})
-        .with(Consumable {})
         .with(ProvidesFood {})
+        .with(Consumable {})
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }
@@ -369,7 +382,7 @@ fn magic_mapping_scroll(ecs: &mut World, x: i32, y: i32) {
             render_order: 2,
         })
         .with(Name {
-            name: "Magic Mapping Scroll".to_string(),
+            name: "Scroll of Magic Mapping".to_string(),
         })
         .with(Item {})
         .with(MagicMapper {})

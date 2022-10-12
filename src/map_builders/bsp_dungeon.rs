@@ -3,7 +3,6 @@ use super::{
     SHOW_MAPGEN_VISUALIZER,
 };
 use rltk::RandomNumberGenerator;
-use specs::prelude::*;
 
 pub struct BspDungeonBuilder {
     map: Map,
@@ -12,6 +11,7 @@ pub struct BspDungeonBuilder {
     rooms: Vec<Rect>,
     history: Vec<Map>,
     rects: Vec<Rect>,
+    spawn_list: Vec<(usize, String)>,
 }
 
 impl MapBuilder for BspDungeonBuilder {
@@ -31,10 +31,8 @@ impl MapBuilder for BspDungeonBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {
-        for room in self.rooms.iter().skip(1) {
-            spawner::spawn_room(ecs, room, self.depth);
-        }
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
     }
 
     fn take_snapshot(&mut self) {
@@ -49,6 +47,7 @@ impl MapBuilder for BspDungeonBuilder {
 }
 
 impl BspDungeonBuilder {
+    #[allow(dead_code)]
     pub fn new(new_depth: i32) -> BspDungeonBuilder {
         BspDungeonBuilder {
             map: Map::new(new_depth),
@@ -57,6 +56,7 @@ impl BspDungeonBuilder {
             rooms: Vec::new(),
             history: Vec::new(),
             rects: Vec::new(),
+            spawn_list: Vec::new(),
         }
     }
 
@@ -115,6 +115,11 @@ impl BspDungeonBuilder {
             x: start.0,
             y: start.1,
         };
+
+        // Spawn some entities
+        for room in self.rooms.iter().skip(1) {
+            spawner::spawn_room(&self.map, &mut rng, room, self.depth, &mut self.spawn_list);
+        }
     }
 
     fn add_subrects(&mut self, rect: Rect) {
