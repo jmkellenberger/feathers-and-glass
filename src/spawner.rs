@@ -154,10 +154,10 @@ pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
 }
 
 fn tamasic(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('o'), "Tamasic");
+    monster(ecs, x, y, rltk::to_cp437('t'), "Tamasic");
 }
 fn foogi(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('g'), "Foogi");
+    monster(ecs, x, y, rltk::to_cp437('f'), "Foogi");
 }
 
 fn monster<S: ToString>(ecs: &mut World, x: i32, y: i32, glyph: rltk::FontCharType, name: S) {
