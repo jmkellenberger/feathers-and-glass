@@ -112,10 +112,11 @@ impl GameState for State {
                 gui::draw_mapgen(ctx);
 
                 self.mapgen_timer += ctx.frame_time_ms;
-                if self.mapgen_timer > 300.0 {
+                if self.mapgen_timer > 200.0 {
                     self.mapgen_timer = 0.0;
                     self.mapgen_index += 1;
                     if self.mapgen_index >= self.mapgen_history.len() {
+                        //self.mapgen_index -= 1;
                         newrunstate = self.mapgen_next_state.unwrap();
                     }
                 }
