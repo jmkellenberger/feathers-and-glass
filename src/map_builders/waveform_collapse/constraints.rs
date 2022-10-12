@@ -1,4 +1,4 @@
-use super::{common::*, Map, TileType};
+use super::{tile_idx_in_chunk, Map, MapChunk, TileType};
 use std::collections::HashSet;
 
 pub fn build_patterns(
@@ -111,7 +111,7 @@ pub fn render_pattern_to_map(
             map.tiles[map_idx] = TileType::DownStairs;
         }
     }
-    for (x, eastbound) in chunk.exits[3].iter().enumerate() {
+    for (x, eastbound) in chunk.exits[2].iter().enumerate() {
         if *eastbound {
             let map_idx = map.xy_idx(start_x + chunk_size - 1, start_y + x as i32);
             map.tiles[map_idx] = TileType::DownStairs;
@@ -206,9 +206,12 @@ pub fn patterns_to_constraints(patterns: Vec<Vec<TileType>>, chunk_size: i32) ->
                         c.compatible_with[direction].push(j);
                     }
                     if !has_any {
-                        // There's no exits on this side, we don't care what goes there
-                        for compat in c.compatible_with.iter_mut() {
-                            compat.push(j);
+                        // There's no exits on this side, let's match only if
+                        // the other edge also has no exits
+                        let matching_exit_count =
+                            potential.exits[opposite].iter().filter(|a| !**a).count();
+                        if matching_exit_count == 0 {
+                            c.compatible_with[direction].push(j);
                         }
                     }
                 }
