@@ -15,6 +15,7 @@ impl RoomDrawer {
         Box::new(RoomDrawer {})
     }
 
+    #[allow(dead_code)]
     fn rectangle(&mut self, build_data: &mut BuilderMap, room: &Rect) {
         for y in room.y1 + 1..=room.y2 {
             for x in room.x1 + 1..=room.x2 {
@@ -26,6 +27,7 @@ impl RoomDrawer {
         }
     }
 
+    #[allow(dead_code)]
     fn circle(&mut self, build_data: &mut BuilderMap, room: &Rect) {
         let radius = i32::min(room.x2 - room.x1, room.y2 - room.y1) as f32 / 2.0;
         let center = room.center();

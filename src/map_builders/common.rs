@@ -9,6 +9,7 @@ pub enum Symmetry {
     Vertical,
     Both,
 }
+
 pub fn apply_horizontal_tunnel(map: &mut Map, x1: i32, x2: i32, y: i32) -> Vec<usize> {
     let mut corridor = Vec::new();
     for x in min(x1, x2)..=max(x1, x2) {
