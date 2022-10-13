@@ -280,10 +280,13 @@ pub fn random_builder(
     if rng.roll_dice(1, 3) == 1 {
         builder.with(WaveformCollapseBuilder::new());
 
+        // Set the start to the center and cull
+        builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+        builder.with(CullUnreachable::new());
+
         // Now set the start to a random starting area
         let (start_x, start_y) = random_start_position(rng);
         builder.with(AreaStartingPosition::new(start_x, start_y));
-
         // Setup an exit and spawn mobs
         builder.with(VoronoiSpawning::new());
         builder.with(DistantExit::new());
