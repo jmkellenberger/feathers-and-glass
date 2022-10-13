@@ -1,9 +1,9 @@
 use super::{
-    map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, BlocksTile, BlocksVisibility,
-    CombatStats, Confusion, Consumable, DefenseBonus, Door, EntryTrigger, EquipmentSlot,
-    Equippable, Hidden, HungerClock, HungerState, InflictsDamage, Item, MagicMapper, Map,
-    MeleePowerBonus, Monster, Name, Player, Position, ProvidesFood, ProvidesHealing, Ranged, Rect,
-    Renderable, SerializeMe, SingleActivation, TileType, Viewshed,
+    random_table::RandomTable, AreaOfEffect, BlocksTile, BlocksVisibility, CombatStats, Confusion,
+    Consumable, DefenseBonus, Door, EntryTrigger, EquipmentSlot, Equippable, Hidden, HungerClock,
+    HungerState, InflictsDamage, Item, MagicMapper, Map, MeleePowerBonus, Monster, Name, Player,
+    Position, ProvidesFood, ProvidesHealing, Ranged, Rect, Renderable, SerializeMe,
+    SingleActivation, TileType, Viewshed,
 };
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
@@ -132,8 +132,11 @@ pub fn spawn_region(
 
 /// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
 pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
-    let x = (*spawn.0 % MAPWIDTH) as i32;
-    let y = (*spawn.0 / MAPWIDTH) as i32;
+    let map = ecs.fetch::<Map>();
+    let width = map.width as usize;
+    let x = (*spawn.0 % width) as i32;
+    let y = (*spawn.0 / width) as i32;
+    std::mem::drop(map);
 
     match spawn.1.as_ref() {
         "Foogi" => foogi(ecs, x, y),
