@@ -7,16 +7,17 @@ use specs::prelude::*;
 
 pub fn draw_mapgen(ctx: &mut Rltk) {
     ctx.draw_box(
-        0,
-        43,
-        79,
-        6,
+        1,
+        1,
+        19,
+        2,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
     );
 
-    ctx.print_color_centered(
-        46,
+    ctx.print_color(
+        2,
+        2,
         RGB::named(rltk::YELLOW),
         RGB::named(rltk::BLACK),
         "Generating map...",
