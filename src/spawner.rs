@@ -1,9 +1,9 @@
 use super::{
-    map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, BlocksTile, CombatStats, Confusion,
-    Consumable, DefenseBonus, EntryTrigger, EquipmentSlot, Equippable, Hidden, HungerClock,
-    HungerState, InflictsDamage, Item, MagicMapper, Map, MeleePowerBonus, Monster, Name, Player,
-    Position, ProvidesFood, ProvidesHealing, Ranged, Rect, Renderable, SerializeMe,
-    SingleActivation, TileType, Viewshed,
+    map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, BlocksTile, BlocksVisibility,
+    CombatStats, Confusion, Consumable, DefenseBonus, Door, EntryTrigger, EquipmentSlot,
+    Equippable, Hidden, HungerClock, HungerState, InflictsDamage, Item, MagicMapper, Map,
+    MeleePowerBonus, Monster, Name, Player, Position, ProvidesFood, ProvidesHealing, Ranged, Rect,
+    Renderable, SerializeMe, SingleActivation, TileType, Viewshed,
 };
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
@@ -149,6 +149,7 @@ pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
         "Rations" => rations(ecs, x, y),
         "Magic Mapping Scroll" => magic_mapping_scroll(ecs, x, y),
         "Bear Trap" => bear_trap(ecs, x, y),
+        "Door" => door(ecs, x, y),
         _ => {}
     }
 }
@@ -407,6 +408,25 @@ fn bear_trap(ecs: &mut World, x: i32, y: i32) {
         .with(EntryTrigger {})
         .with(InflictsDamage { damage: 6 })
         .with(SingleActivation {})
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
+fn door(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position { x, y })
+        .with(Renderable {
+            glyph: rltk::to_cp437('+'),
+            fg: RGB::named(rltk::CHOCOLATE),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2,
+        })
+        .with(Name {
+            name: "Door".to_string(),
+        })
+        .with(BlocksTile {})
+        .with(BlocksVisibility {})
+        .with(Door { open: false })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }

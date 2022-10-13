@@ -522,6 +522,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<EntityMoved>();
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<MovesRandomly>();
+    gs.ecs.register::<Door>();
+    gs.ecs.register::<BlocksVisibility>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
