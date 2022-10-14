@@ -57,6 +57,9 @@ use voronoi::VoronoiCellBuilder;
 use voronoi_spawning::VoronoiSpawning;
 use waveform_collapse::WaveformCollapseBuilder;
 
+mod town;
+use town::town_builder;
+
 pub struct BuilderMap {
     pub spawn_list: Vec<(usize, String)>,
     pub map: Map,
@@ -143,6 +146,19 @@ pub trait InitialMapBuilder {
 
 pub trait MetaMapBuilder {
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap);
+}
+
+pub fn level_builder(
+    new_depth: i32,
+    rng: &mut rltk::RandomNumberGenerator,
+    width: i32,
+    height: i32,
+) -> BuilderChain {
+    rltk::console::log(format!("Depth: {}", new_depth));
+    match new_depth {
+        1 => town_builder(new_depth, rng, width, height),
+        _ => random_builder(new_depth, rng, width, height),
+    }
 }
 
 fn random_start_position(rng: &mut rltk::RandomNumberGenerator) -> (XStart, YStart) {
