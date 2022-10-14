@@ -98,17 +98,17 @@ impl PrefabBuilder {
                 });
             }
             '>' => build_data.map.tiles[idx] = TileType::DownStairs,
-            'g' => {
+            'f' => {
                 build_data.map.tiles[idx] = TileType::Floor;
-                build_data.spawn_list.push((idx, "Goblin".to_string()));
+                build_data.spawn_list.push((idx, "Foogi".to_string()));
             }
-            'o' => {
+            't' => {
                 build_data.map.tiles[idx] = TileType::Floor;
-                build_data.spawn_list.push((idx, "Orc".to_string()));
+                build_data.spawn_list.push((idx, "Mutant".to_string()));
             }
             '^' => {
                 build_data.map.tiles[idx] = TileType::Floor;
-                build_data.spawn_list.push((idx, "Bear Trap".to_string()));
+                build_data.spawn_list.push((idx, "Spike Trap".to_string()));
             }
             '%' => {
                 build_data.map.tiles[idx] = TileType::Floor;

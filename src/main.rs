@@ -2,6 +2,9 @@ use rltk::{GameState, Point, Rltk};
 use specs::prelude::*;
 use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 
+#[macro_use]
+extern crate lazy_static;
+
 mod components;
 pub use components::*;
 mod map;
@@ -30,6 +33,7 @@ pub mod hunger_system;
 pub mod map_builders;
 pub mod particle_system;
 pub mod random_table;
+pub mod raws;
 pub mod rex_assets;
 pub mod saveload_system;
 pub mod trigger_system;
@@ -514,6 +518,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<BlocksVisibility>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
+
+    raws::load_raws();
 
     gs.ecs.insert(Map::new(1, 64, 64));
     gs.ecs.insert(Point::new(0, 0));
