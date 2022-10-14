@@ -39,7 +39,7 @@ use dla::DLABuilder;
 use door_placement::DoorPlacement;
 use drunkard::DrunkardsWalkBuilder;
 use maze::MazeBuilder;
-use prefab_builder::PrefabBuilder;
+// use prefab_builder::PrefabBuilder;
 use room_based_spawner::RoomBasedSpawner;
 use room_based_stairs::RoomBasedStairs;
 use room_based_starting_position::RoomBasedStartingPosition;
@@ -247,7 +247,7 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut Buil
 }
 
 fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut BuilderChain) {
-    let builder_roll = rng.roll_dice(1, 16);
+    let builder_roll = rng.roll_dice(1, 13);
     match builder_roll {
         1 => builder.start_with(CellularAutomataBuilder::new()),
         2 => builder.start_with(DrunkardsWalkBuilder::open_area()),
@@ -261,10 +261,10 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut Bui
         10 => builder.start_with(DLABuilder::central_attractor()),
         11 => builder.start_with(DLABuilder::insectoid()),
         12 => builder.start_with(VoronoiCellBuilder::pythagoras()),
-        13 => builder.start_with(VoronoiCellBuilder::manhattan()),
-        _ => builder.start_with(PrefabBuilder::constant(
-            prefab_builder::prefab_levels::WFC_POPULATED,
-        )),
+        _ => builder.start_with(VoronoiCellBuilder::manhattan()),
+        // _ => builder.start_with(PrefabBuilder::constant(
+        //     prefab_builder::prefab_levels::WFC_POPULATED,
+        // )),
     }
 
     // Set the start to the center and cull
@@ -305,14 +305,14 @@ pub fn random_builder(
         builder.with(DistantExit::new());
     }
 
-    if rng.roll_dice(1, 20) == 1 {
-        builder.with(PrefabBuilder::sectional(
-            prefab_builder::prefab_sections::UNDERGROUND_FORT,
-        ));
-    }
+    // if rng.roll_dice(1, 20) == 1 {
+    //     builder.with(PrefabBuilder::sectional(
+    //         prefab_builder::prefab_sections::UNDERGROUND_FORT,
+    //     ));
+    // }
 
     builder.with(DoorPlacement::new());
-    builder.with(PrefabBuilder::vaults());
+    // builder.with(PrefabBuilder::vaults());
 
     builder
 }

@@ -205,7 +205,7 @@ pub struct EntityMoved {}
 pub struct SingleActivation {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct MovesRandomly {}
+pub struct Bystander {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct BlocksVisibility {}

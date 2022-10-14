@@ -513,7 +513,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<EntityMoved>();
     gs.ecs.register::<SingleActivation>();
-    gs.ecs.register::<MovesRandomly>();
+    gs.ecs.register::<Bystander>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<BlocksVisibility>();
 

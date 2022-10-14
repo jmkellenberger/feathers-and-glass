@@ -29,7 +29,7 @@ impl<'a> System<'a> for HungerSystem {
                 }
                 RunState::MonsterTurn => {
                     if entity != *player_entity {
-                        proceed = true;
+                        proceed = false;
                     }
                 }
                 _ => proceed = false,
