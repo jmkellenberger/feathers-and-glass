@@ -28,6 +28,7 @@ mod gui;
 mod inventory_system;
 mod spawner;
 use inventory_system::{ItemCollectionSystem, ItemDropSystem, ItemRemoveSystem, ItemUseSystem};
+pub mod bystander_ai_system;
 pub mod camera;
 pub mod hunger_system;
 pub mod map_builders;
@@ -297,6 +298,8 @@ impl State {
         mob.run_now(&self.ecs);
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
+        let mut bystander = bystander_ai_system::BystanderAI {};
+        bystander.run_now(&self.ecs);
         let mut triggers = trigger_system::TriggerSystem {};
         triggers.run_now(&self.ecs);
         let mut melee = MeleeCombatSystem {};
@@ -516,6 +519,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Bystander>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<BlocksVisibility>();
+    gs.ecs.register::<Vendor>();
+    gs.ecs.register::<Quips>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 

@@ -82,7 +82,9 @@ pub fn save_game(ecs: &mut World) {
             EntityMoved,
             Bystander,
             Door,
-            BlocksVisibility
+            BlocksVisibility,
+            Vendor,
+            Quips
         );
     }
 
@@ -169,7 +171,9 @@ pub fn load_game(ecs: &mut World) {
             EntityMoved,
             Bystander,
             Door,
-            BlocksVisibility
+            BlocksVisibility,
+            Vendor,
+            Quips
         );
     }
 
