@@ -1,8 +1,14 @@
 {
     "spawn_table": [
         {
-            "name": "Foogi",
+            "name": "Rat",
             "weight": 10,
+            "min_depth": 0,
+            "max_depth": 100
+        },
+        {
+            "name": "Foogi",
+            "weight": 8,
             "min_depth": 0,
             "max_depth": 100
         },
@@ -88,7 +94,7 @@
             "max_depth": 100
         },
         {
-            "name": "Foogi Runt",
+            "name": "Foogi Scamp",
             "weight": 15,
             "min_depth": 0,
             "max_depth": 3
@@ -250,7 +256,7 @@
     ],
     "mobs": [
         {
-            "name": "Barkeep",
+            "name": "Proprietor",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#EE82EE",
@@ -265,7 +271,11 @@
                 "power": 4
             },
             "vision_range": 4,
-            "ai": "vendor"
+            "ai": "vendor",
+            "quips": [
+                "Welcome to the Quaking Copyist.",
+                "Would you like to sample a rare tea?"
+            ]
         },
         {
             "name": "Shady Salesman",
@@ -303,13 +313,13 @@
             "vision_range": 4,
             "ai": "bystander",
             "quips": [
-                "Quiet down, it's too early!",
-                "Oh my, I drank too much.",
-                "That hero stuff isn't so hard."
+                "Let me, ah, tell you about my dream",
+                "Sit down, have some tea.",
+                "Up for a quick game of chaturanga?"
             ]
         },
         {
-            "name": "Priest",
+            "name": "Eychep",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#EE82EE",
@@ -324,10 +334,13 @@
                 "power": 4
             },
             "vision_range": 4,
-            "ai": "vendor"
+            "ai": "vendor",
+            "quips": [
+                "Welcome to our community"
+            ]
         },
         {
-            "name": "Parishioner",
+            "name": "Revolutionary",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#AAAAAA",
@@ -345,12 +358,11 @@
             "ai": "bystander",
             "quips": [
                 "Great to see a new face here!",
-                "I hear there's going to be a good sermon on subservience",
                 "Want a smoke?"
             ]
         },
         {
-            "name": "Blacksmith",
+            "name": "Artificer",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#EE82EE",
@@ -368,7 +380,7 @@
             "ai": "vendor"
         },
         {
-            "name": "Clothier",
+            "name": "Pawnbroker",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#EE82EE",
@@ -386,7 +398,7 @@
             "ai": "vendor"
         },
         {
-            "name": "Alchemist",
+            "name": "Physic",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#EE82EE",
@@ -404,7 +416,7 @@
             "ai": "vendor"
         },
         {
-            "name": "Mom",
+            "name": "Absent-minded Scholar",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#FFAAAA",
@@ -421,14 +433,13 @@
             "vision_range": 4,
             "ai": "bystander",
             "quips": [
-                "Hello, dear",
-                "Off saving the world again?",
-                "Be careful in the dungeon!",
-                "Your father would be so proud, were he here."
+                "Do bring by any interesting finds",
+                "Be careful around any texts",
+                "Try not to get blood on the pages"
             ]
         },
         {
-            "name": "Peasant",
+            "name": "Scavenger",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#999999",
@@ -445,7 +456,9 @@
             "vision_range": 4,
             "ai": "bystander",
             "quips": [
-                "Why are you in my house?"
+                "You going into the ruins?",
+                "You won't last long",
+                "This town's getting too crowded"
             ]
         },
         {
@@ -495,7 +508,7 @@
             ]
         },
         {
-            "name": "Wannabe Pirate",
+            "name": "Smuggler",
             "renderable": {
                 "glyph": "☺",
                 "fg": "#aa9999",
@@ -595,9 +608,9 @@
             "ai": "melee"
         },
         {
-            "name": "Foogi Runt",
+            "name": "Foogi Scamp",
             "renderable": {
-                "glyph": "r",
+                "glyph": "s",
                 "fg": "#FF0000",
                 "bg": "#000000",
                 "order": 1
@@ -644,7 +657,7 @@
             "door_open": true
         },
         {
-            "name": "Keg",
+            "name": "Hookah",
             "renderable": {
                 "glyph": "φ",
                 "fg": "#AAAAAA",
@@ -778,6 +791,16 @@
             "renderable": {
                 "glyph": "π",
                 "fg": "#805A46",
+                "bg": "#000000",
+                "order": 2
+            },
+            "hidden": false
+        },
+        {
+            "name": "Broken Gods-Eye",
+            "renderable": {
+                "glyph": "☼",
+                "fg": "#b5a642",
                 "bg": "#000000",
                 "order": 2
             },

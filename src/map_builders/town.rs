@@ -22,11 +22,11 @@ impl InitialMapBuilder for TownBuilder {
 }
 
 enum BuildingTag {
-    Pub,
+    Teahouse,
     Temple,
-    Blacksmith,
-    Clothier,
-    Alchemist,
+    Artificer,
+    Pawnbroker,
+    Physic,
     PlayerHouse,
     Hovel,
     Abandoned,
@@ -303,11 +303,11 @@ impl TownBuilder {
             building_size.push((i, building.2 * building.3, BuildingTag::Unassigned));
         }
         building_size.sort_by(|a, b| b.1.cmp(&a.1));
-        building_size[0].2 = BuildingTag::Pub;
+        building_size[0].2 = BuildingTag::Teahouse;
         building_size[1].2 = BuildingTag::Temple;
-        building_size[2].2 = BuildingTag::Blacksmith;
-        building_size[3].2 = BuildingTag::Clothier;
-        building_size[4].2 = BuildingTag::Alchemist;
+        building_size[2].2 = BuildingTag::Artificer;
+        building_size[3].2 = BuildingTag::Pawnbroker;
+        building_size[4].2 = BuildingTag::Physic;
         building_size[5].2 = BuildingTag::PlayerHouse;
         for b in building_size.iter_mut().skip(6) {
             b.2 = BuildingTag::Hovel;
@@ -327,11 +327,11 @@ impl TownBuilder {
         for (i, building) in buildings.iter().enumerate() {
             let build_type = &building_index[i].2;
             match build_type {
-                BuildingTag::Pub => self.build_pub(&building, build_data, rng),
+                BuildingTag::Teahouse => self.build_teahouse(&building, build_data, rng),
                 BuildingTag::Temple => self.build_temple(&building, build_data, rng),
-                BuildingTag::Blacksmith => self.build_smith(&building, build_data, rng),
-                BuildingTag::Clothier => self.build_clothier(&building, build_data, rng),
-                BuildingTag::Alchemist => self.build_alchemist(&building, build_data, rng),
+                BuildingTag::Artificer => self.build_artificer(&building, build_data, rng),
+                BuildingTag::Pawnbroker => self.build_pawnbroker(&building, build_data, rng),
+                BuildingTag::Physic => self.build_physic(&building, build_data, rng),
                 BuildingTag::PlayerHouse => self.build_my_house(&building, build_data, rng),
                 BuildingTag::Hovel => self.build_hovel(&building, build_data, rng),
                 BuildingTag::Abandoned => self.build_abandoned_house(&building, build_data, rng),
@@ -364,7 +364,7 @@ impl TownBuilder {
         }
     }
 
-    fn build_pub(
+    fn build_teahouse(
         &mut self,
         building: &(i32, i32, i32, i32),
         build_data: &mut BuilderMap,
@@ -381,11 +381,11 @@ impl TownBuilder {
 
         // Place other items
         let mut to_place: Vec<&str> = vec![
-            "Barkeep",
+            "Proprietor",
             "Shady Salesman",
             "Patron",
             "Patron",
-            "Keg",
+            "Hookah",
             "Table",
             "Chair",
             "Table",
@@ -402,9 +402,10 @@ impl TownBuilder {
     ) {
         // Place items
         let mut to_place: Vec<&str> = vec![
-            "Priest",
-            "Parishioner",
-            "Parishioner",
+            "Eychep",
+            "Revolutionary",
+            "Revolutionary",
+            "Broken Gods-Eye",
             "Chair",
             "Chair",
             "Candle",
@@ -413,7 +414,7 @@ impl TownBuilder {
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 
-    fn build_smith(
+    fn build_artificer(
         &mut self,
         building: &(i32, i32, i32, i32),
         build_data: &mut BuilderMap,
@@ -421,7 +422,7 @@ impl TownBuilder {
     ) {
         // Place items
         let mut to_place: Vec<&str> = vec![
-            "Blacksmith",
+            "Artificer",
             "Anvil",
             "Water Trough",
             "Weapon Rack",
@@ -430,18 +431,18 @@ impl TownBuilder {
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 
-    fn build_clothier(
+    fn build_pawnbroker(
         &mut self,
         building: &(i32, i32, i32, i32),
         build_data: &mut BuilderMap,
         rng: &mut rltk::RandomNumberGenerator,
     ) {
         // Place items
-        let mut to_place: Vec<&str> = vec!["Clothier", "Cabinet", "Table", "Loom", "Hide Rack"];
+        let mut to_place: Vec<&str> = vec!["Pawnbroker", "Cabinet", "Table", "Loom", "Hide Rack"];
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 
-    fn build_alchemist(
+    fn build_physic(
         &mut self,
         building: &(i32, i32, i32, i32),
         build_data: &mut BuilderMap,
@@ -449,7 +450,7 @@ impl TownBuilder {
     ) {
         // Place items
         let mut to_place: Vec<&str> =
-            vec!["Alchemist", "Chemistry Set", "Dead Thing", "Chair", "Table"];
+            vec!["Physic", "Chemistry Set", "Dead Thing", "Chair", "Table"];
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 
@@ -460,7 +461,8 @@ impl TownBuilder {
         rng: &mut rltk::RandomNumberGenerator,
     ) {
         // Place items
-        let mut to_place: Vec<&str> = vec!["Mom", "Bed", "Cabinet", "Chair", "Table"];
+        let mut to_place: Vec<&str> =
+            vec!["Absent-minded Scholar", "Bed", "Cabinet", "Chair", "Table"];
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 
@@ -471,7 +473,7 @@ impl TownBuilder {
         rng: &mut rltk::RandomNumberGenerator,
     ) {
         // Place items
-        let mut to_place: Vec<&str> = vec!["Peasant", "Bed", "Chair", "Table"];
+        let mut to_place: Vec<&str> = vec!["Scavenger", "Bed", "Chair", "Table"];
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 
@@ -504,9 +506,7 @@ impl TownBuilder {
                 let roll = rng.roll_dice(1, 3);
                 match roll {
                     1 => build_data.spawn_list.push((idx, "Dock Worker".to_string())),
-                    2 => build_data
-                        .spawn_list
-                        .push((idx, "Wannabe Pirate".to_string())),
+                    2 => build_data.spawn_list.push((idx, "Smuggler".to_string())),
                     _ => build_data.spawn_list.push((idx, "Fisher".to_string())),
                 }
             }
@@ -520,10 +520,10 @@ impl TownBuilder {
         available_building_tiles: &mut HashSet<usize>,
     ) {
         for idx in available_building_tiles.iter() {
-            if rng.roll_dice(1, 10) == 1 {
-                let roll = rng.roll_dice(1, 4);
+            if rng.roll_dice(1, 12) == 1 {
+                let roll = rng.roll_dice(1, 6);
                 match roll {
-                    1 => build_data.spawn_list.push((*idx, "Peasant".to_string())),
+                    1 => build_data.spawn_list.push((*idx, "Scavenger".to_string())),
                     2 => build_data.spawn_list.push((*idx, "Drunk".to_string())),
                     3 => build_data
                         .spawn_list
