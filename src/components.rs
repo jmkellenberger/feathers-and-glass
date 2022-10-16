@@ -4,6 +4,7 @@ use specs::error::NoError;
 use specs::prelude::*;
 use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::*;
+use std::collections::HashMap;
 
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Position {
@@ -19,7 +20,7 @@ pub struct Renderable {
     pub render_order: i32,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Player {}
 
 #[derive(Component, ConvertSaveload, Clone)]
@@ -32,6 +33,12 @@ pub struct Viewshed {
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Monster {}
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Bystander {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Vendor {}
+
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Name {
     pub name: String,
@@ -40,12 +47,45 @@ pub struct Name {
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct BlocksTile {}
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
-pub struct CombatStats {
-    pub max_hp: i32,
-    pub hp: i32,
-    pub defense: i32,
-    pub power: i32,
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Pool {
+    pub max: i32,
+    pub current: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Pools {
+    pub hit_points: Pool,
+    pub mana: Pool,
+    pub xp: i32,
+    pub level: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Attribute {
+    pub base: i32,
+    pub modifiers: i32,
+    pub bonus: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Attributes {
+    pub might: Attribute,
+    pub fitness: Attribute,
+    pub quickness: Attribute,
+    pub intelligence: Attribute,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub enum Skill {
+    Melee,
+    Defense,
+    Magic,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Skills {
+    pub skills: HashMap<Skill, i32>,
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
@@ -102,43 +142,50 @@ pub struct ProvidesHealing {
     pub heal_amount: i32,
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct BlocksVisibility {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Door {
+    pub open: bool,
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct InBackpack {
     pub owner: Entity,
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToPickupItem {
     pub collected_by: Entity,
     pub item: Entity,
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToUseItem {
     pub item: Entity,
     pub target: Option<rltk::Point>,
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToDropItem {
     pub item: Entity,
 }
 
-// Serialization helper code. We need to implement ConvertSaveload for each type that contains an
-// Entity.
-
-pub struct SerializeMe;
-
-// Special component that exists to help serialize the game data
-#[derive(Component, Serialize, Deserialize, Clone)]
-pub struct SerializationHelper {
-    pub map: super::map::Map,
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantsToRemoveItem {
+    pub item: Entity,
 }
 
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub enum EquipmentSlot {
     Melee,
     Shield,
+    Head,
+    Torso,
+    Legs,
+    Feet,
+    Hands,
 }
 
 #[derive(Component, Serialize, Deserialize, Clone)]
@@ -152,19 +199,40 @@ pub struct Equipped {
     pub slot: EquipmentSlot,
 }
 
-#[derive(Component, ConvertSaveload, Clone)]
-pub struct MeleePowerBonus {
-    pub power: i32,
+#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
+pub enum WeaponAttribute {
+    Might,
+    Quickness,
 }
 
-#[derive(Component, ConvertSaveload, Clone)]
-pub struct DefenseBonus {
-    pub defense: i32,
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct MeleeWeapon {
+    pub attribute: WeaponAttribute,
+    pub damage_n_dice: i32,
+    pub damage_die_type: i32,
+    pub damage_bonus: i32,
+    pub hit_bonus: i32,
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
-pub struct WantsToRemoveItem {
-    pub item: Entity,
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct Wearable {
+    pub armor_class: f32,
+    pub slot: EquipmentSlot,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct NaturalAttack {
+    pub name: String,
+    pub damage_n_dice: i32,
+    pub damage_die_type: i32,
+    pub damage_bonus: i32,
+    pub hit_bonus: i32,
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct NaturalAttackDefense {
+    pub armor_class: Option<i32>,
+    pub attacks: Vec<NaturalAttack>,
 }
 
 #[derive(Component, Serialize, Deserialize, Clone)]
@@ -205,20 +273,17 @@ pub struct EntityMoved {}
 pub struct SingleActivation {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Bystander {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct BlocksVisibility {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Door {
-    pub open: bool,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Vendor {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Quips {
     pub available: Vec<String>,
+}
+
+// Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
+// Entity.
+
+pub struct SerializeMe;
+
+// Special component that exists to help serialize the game data
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct SerializationHelper {
+    pub map: super::map::Map,
 }

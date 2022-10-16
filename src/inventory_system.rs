@@ -1,8 +1,8 @@
 use super::{
-    gamelog::GameLog, particle_system::ParticleBuilder, AreaOfEffect, CombatStats, Confusion,
-    Consumable, Equippable, Equipped, HungerClock, HungerState, InBackpack, InflictsDamage,
-    MagicMapper, Map, Name, Position, ProvidesFood, ProvidesHealing, RunState, SufferDamage,
-    WantsToDropItem, WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
+    gamelog::GameLog, particle_system::ParticleBuilder, AreaOfEffect, Confusion, Consumable,
+    Equippable, Equipped, HungerClock, HungerState, InBackpack, InflictsDamage, MagicMapper, Map,
+    Name, Pools, Position, ProvidesFood, ProvidesHealing, RunState, SufferDamage, WantsToDropItem,
+    WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
 };
 use specs::prelude::*;
 
@@ -60,7 +60,7 @@ impl<'a> System<'a> for ItemUseSystem {
         ReadStorage<'a, Consumable>,
         ReadStorage<'a, ProvidesHealing>,
         ReadStorage<'a, InflictsDamage>,
-        WriteStorage<'a, CombatStats>,
+        WriteStorage<'a, Pools>,
         WriteStorage<'a, SufferDamage>,
         ReadStorage<'a, AreaOfEffect>,
         WriteStorage<'a, Confusion>,
@@ -101,31 +101,21 @@ impl<'a> System<'a> for ItemUseSystem {
             magic_mapper,
             mut runstate,
         ) = data;
-        for (entity, use_item) in (&entities, &wants_use).join() {
-            let mut used_item = true;
 
-            // If its a magic mapper...
-            let is_mapper = magic_mapper.get(use_item.item);
-            match is_mapper {
-                None => {}
-                Some(_) => {
-                    used_item = true;
-                    gamelog
-                        .entries
-                        .push("The map is revealed to you!".to_string());
-                    *runstate = RunState::MagicMapReveal { row: 0 };
-                }
-            }
+        for (entity, useitem) in (&entities, &wants_use).join() {
+            let mut used_item = true;
 
             // Targeting
             let mut targets: Vec<Entity> = Vec::new();
-            match use_item.target {
-                None => targets.push(*player_entity),
+            match useitem.target {
+                None => {
+                    targets.push(*player_entity);
+                }
                 Some(target) => {
-                    let area_effect = aoe.get(use_item.item);
+                    let area_effect = aoe.get(useitem.item);
                     match area_effect {
                         None => {
-                            // single target in tile
+                            // Single target in tile
                             let idx = map.xy_idx(target.x, target.y);
                             for mob in map.tile_content[idx].iter() {
                                 targets.push(*mob);
@@ -158,7 +148,7 @@ impl<'a> System<'a> for ItemUseSystem {
             }
 
             // If it is equippable, then we want to equip it - and unequip whatever else was in that slot
-            let item_equippable = equippable.get(use_item.item);
+            let item_equippable = equippable.get(useitem.item);
             match item_equippable {
                 None => {}
                 Some(can_equip) => {
@@ -188,24 +178,25 @@ impl<'a> System<'a> for ItemUseSystem {
                     // Wield the item
                     equipped
                         .insert(
-                            use_item.item,
+                            useitem.item,
                             Equipped {
                                 owner: target,
                                 slot: target_slot,
                             },
                         )
                         .expect("Unable to insert equipped component");
-                    backpack.remove(use_item.item);
+                    backpack.remove(useitem.item);
                     if target == *player_entity {
                         gamelog.entries.push(format!(
                             "You equip {}.",
-                            names.get(use_item.item).unwrap().name
+                            names.get(useitem.item).unwrap().name
                         ));
                     }
                 }
             }
 
-            let item_edible = provides_food.get(use_item.item);
+            // It it is edible, eat it!
+            let item_edible = provides_food.get(useitem.item);
             match item_edible {
                 None => {}
                 Some(_) => {
@@ -216,25 +207,43 @@ impl<'a> System<'a> for ItemUseSystem {
                         hc.state = HungerState::WellFed;
                         hc.duration = 20;
                         gamelog.entries.push(format!(
-                            "You eat the {}",
-                            names.get(use_item.item).unwrap().name
+                            "You eat the {}.",
+                            names.get(useitem.item).unwrap().name
                         ));
                     }
                 }
             }
 
-            let item_heals = healing.get(use_item.item);
+            // If its a magic mapper...
+            let is_mapper = magic_mapper.get(useitem.item);
+            match is_mapper {
+                None => {}
+                Some(_) => {
+                    used_item = true;
+                    gamelog
+                        .entries
+                        .push("The map is revealed to you!".to_string());
+                    *runstate = RunState::MagicMapReveal { row: 0 };
+                }
+            }
+
+            // If it heals, apply the healing
+            let item_heals = healing.get(useitem.item);
             match item_heals {
                 None => {}
                 Some(healer) => {
+                    used_item = false;
                     for target in targets.iter() {
                         let stats = combat_stats.get_mut(*target);
                         if let Some(stats) = stats {
-                            stats.hp = i32::min(stats.max_hp, stats.hp + healer.heal_amount);
+                            stats.hit_points.current = i32::min(
+                                stats.hit_points.max,
+                                stats.hit_points.current + healer.heal_amount,
+                            );
                             if entity == *player_entity {
                                 gamelog.entries.push(format!(
-                                    "You drink the {} and heal {} hp.",
-                                    names.get(use_item.item).unwrap().name,
+                                    "You use the {}, healing {} hp.",
+                                    names.get(useitem.item).unwrap().name,
                                     healer.heal_amount
                                 ));
                             }
@@ -256,7 +265,8 @@ impl<'a> System<'a> for ItemUseSystem {
                 }
             }
 
-            let item_damages = inflict_damage.get(use_item.item);
+            // If it inflicts damage, apply it to the target cell
+            let item_damages = inflict_damage.get(useitem.item);
             match item_damages {
                 None => {}
                 Some(damage) => {
@@ -265,7 +275,7 @@ impl<'a> System<'a> for ItemUseSystem {
                         SufferDamage::new_damage(&mut suffer_damage, *mob, damage.damage);
                         if entity == *player_entity {
                             let mob_name = names.get(*mob).unwrap();
-                            let item_name = names.get(use_item.item).unwrap();
+                            let item_name = names.get(useitem.item).unwrap();
                             gamelog.entries.push(format!(
                                 "You use {} on {}, inflicting {} hp.",
                                 item_name.name, mob_name.name, damage.damage
@@ -292,7 +302,7 @@ impl<'a> System<'a> for ItemUseSystem {
             // Can it pass along confusion? Note the use of scopes to escape from the borrow checker!
             let mut add_confusion = Vec::new();
             {
-                let causes_confusion = confused.get(use_item.item);
+                let causes_confusion = confused.get(useitem.item);
                 match causes_confusion {
                     None => {}
                     Some(confusion) => {
@@ -301,7 +311,7 @@ impl<'a> System<'a> for ItemUseSystem {
                             add_confusion.push((*mob, confusion.turns));
                             if entity == *player_entity {
                                 let mob_name = names.get(*mob).unwrap();
-                                let item_name = names.get(use_item.item).unwrap();
+                                let item_name = names.get(useitem.item).unwrap();
                                 gamelog.entries.push(format!(
                                     "You use {} on {}, confusing them.",
                                     item_name.name, mob_name.name
@@ -329,16 +339,18 @@ impl<'a> System<'a> for ItemUseSystem {
                     .expect("Unable to insert status");
             }
 
+            // If its a consumable, we delete it on use
             if used_item {
-                let consumable = consumables.get(use_item.item);
+                let consumable = consumables.get(useitem.item);
                 match consumable {
                     None => {}
                     Some(_) => {
-                        entities.delete(use_item.item).expect("Delete Failed");
+                        entities.delete(useitem.item).expect("Delete failed");
                     }
                 }
             }
         }
+
         wants_use.clear();
     }
 }
@@ -397,6 +409,7 @@ impl<'a> System<'a> for ItemDropSystem {
         wants_drop.clear();
     }
 }
+
 pub struct ItemRemoveSystem {}
 
 impl<'a> System<'a> for ItemRemoveSystem {

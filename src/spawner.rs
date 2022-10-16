@@ -1,7 +1,9 @@
 use super::{
-    random_table::RandomTable, raws::*, CombatStats, HungerClock, HungerState, Map, Name, Player,
-    Position, Rect, Renderable, SerializeMe, TileType, Viewshed,
+    random_table::RandomTable, raws::*, Attribute, Attributes, HungerClock, HungerState, Map, Name,
+    Player, Pool, Pools, Position, Rect, Renderable, SerializeMe, Skill, Skills, TileType,
+    Viewshed,
 };
+use crate::{attr_bonus, mana_at_level, player_hp_at_level};
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
@@ -9,7 +11,15 @@ use std::collections::HashMap;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
-    ecs.create_entity()
+    let mut skills = Skills {
+        skills: HashMap::new(),
+    };
+    skills.skills.insert(Skill::Melee, 1);
+    skills.skills.insert(Skill::Defense, 1);
+    skills.skills.insert(Skill::Magic, 1);
+
+    let player = ecs
+        .create_entity()
         .with(Position {
             x: player_x,
             y: player_y,
@@ -29,18 +39,87 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .with(Name {
             name: "Player".to_string(),
         })
-        .with(CombatStats {
-            max_hp: 30,
-            hp: 30,
-            defense: 2,
-            power: 5,
-        })
         .with(HungerClock {
             state: HungerState::WellFed,
             duration: 20,
         })
+        .with(Attributes {
+            might: Attribute {
+                base: 11,
+                modifiers: 0,
+                bonus: attr_bonus(11),
+            },
+            fitness: Attribute {
+                base: 11,
+                modifiers: 0,
+                bonus: attr_bonus(11),
+            },
+            quickness: Attribute {
+                base: 11,
+                modifiers: 0,
+                bonus: attr_bonus(11),
+            },
+            intelligence: Attribute {
+                base: 11,
+                modifiers: 0,
+                bonus: attr_bonus(11),
+            },
+        })
+        .with(skills)
+        .with(Pools {
+            hit_points: Pool {
+                current: player_hp_at_level(11, 1),
+                max: player_hp_at_level(11, 1),
+            },
+            mana: Pool {
+                current: mana_at_level(11, 1),
+                max: mana_at_level(11, 1),
+            },
+            xp: 0,
+            level: 1,
+        })
         .marked::<SimpleMarker<SerializeMe>>()
-        .build()
+        .build();
+
+    // Starting equipment
+    spawn_named_entity(
+        &RAWS.lock().unwrap(),
+        ecs,
+        "Rusty Longsword",
+        SpawnType::Equipped { by: player },
+    );
+    spawn_named_entity(
+        &RAWS.lock().unwrap(),
+        ecs,
+        "Dried Sausage",
+        SpawnType::Carried { by: player },
+    );
+    spawn_named_entity(
+        &RAWS.lock().unwrap(),
+        ecs,
+        "Beer",
+        SpawnType::Carried { by: player },
+    );
+    spawn_named_entity(
+        &RAWS.lock().unwrap(),
+        ecs,
+        "Stained Tunic",
+        SpawnType::Equipped { by: player },
+    );
+    spawn_named_entity(
+        &RAWS.lock().unwrap(),
+        ecs,
+        "Torn Trousers",
+        SpawnType::Equipped { by: player },
+    );
+    spawn_named_entity(
+        &RAWS.lock().unwrap(),
+        ecs,
+        "Old Boots",
+        SpawnType::Equipped { by: player },
+    );
+
+    player
 }
 
 const MAX_MONSTERS: i32 = 4;
@@ -124,7 +203,7 @@ pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
 
     let spawn_result = spawn_named_entity(
         &RAWS.lock().unwrap(),
-        ecs.create_entity(),
+        ecs,
         &spawn.1,
         SpawnType::AtPosition { x, y },
     );
