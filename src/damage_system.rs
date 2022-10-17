@@ -1,4 +1,7 @@
-use super::{gamelog::GameLog, Map, Name, Player, Pools, Position, RunState, SufferDamage};
+use super::{
+    gamelog::GameLog, Equipped, InBackpack, Map, Name, Player, Pools, Position, RunState,
+    SufferDamage,
+};
 use specs::prelude::*;
 
 pub struct DamageSystem {}
@@ -54,6 +57,43 @@ pub fn delete_the_dead(ecs: &mut World) {
                     }
                 }
             }
+        }
+    }
+
+    // Drop everything held by dead people
+    {
+        let mut to_drop: Vec<(Entity, Position)> = Vec::new();
+        let entities = ecs.entities();
+        let mut equipped = ecs.write_storage::<Equipped>();
+        let mut carried = ecs.write_storage::<InBackpack>();
+        let mut positions = ecs.write_storage::<Position>();
+        for victim in dead.iter() {
+            for (entity, equipped) in (&entities, &equipped).join() {
+                if equipped.owner == *victim {
+                    // Drop their stuff
+                    let pos = positions.get(*victim);
+                    if let Some(pos) = pos {
+                        to_drop.push((entity, pos.clone()));
+                    }
+                }
+            }
+            for (entity, backpack) in (&entities, &carried).join() {
+                if backpack.owner == *victim {
+                    // Drop their stuff
+                    let pos = positions.get(*victim);
+                    if let Some(pos) = pos {
+                        to_drop.push((entity, pos.clone()));
+                    }
+                }
+            }
+        }
+
+        for drop in to_drop.iter() {
+            equipped.remove(drop.0);
+            carried.remove(drop.0);
+            positions
+                .insert(drop.0, drop.1.clone())
+                .expect("Unable to insert position");
         }
     }
 
