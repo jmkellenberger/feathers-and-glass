@@ -2,7 +2,9 @@ use rltk::{Algorithm2D, BaseMap, Point};
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
 use std::collections::HashSet;
+mod themes;
 mod tiletype;
+pub use themes::*;
 pub use tiletype::{tile_cost, tile_opaque, tile_walkable, TileType};
 
 #[derive(Default, Serialize, Deserialize, Clone)]

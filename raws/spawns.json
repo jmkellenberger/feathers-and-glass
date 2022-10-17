@@ -3,13 +3,13 @@
         {
             "name": "Foogi",
             "weight": 10,
-            "min_depth": 0,
+            "min_depth": 3,
             "max_depth": 100
         },
         {
             "name": "Mutant",
             "weight": 1,
-            "min_depth": 0,
+            "min_depth": 3,
             "max_depth": 100,
             "add_map_depth_to_weight": true
         },
@@ -54,13 +54,13 @@
         {
             "name": "Longsword",
             "weight": 1,
-            "min_depth": 1,
+            "min_depth": 3,
             "max_depth": 100
         },
         {
             "name": "Tower Shield",
             "weight": 1,
-            "min_depth": 1,
+            "min_depth": 3,
             "max_depth": 100
         },
         {
@@ -76,7 +76,7 @@
             "max_depth": 100
         },
         {
-            "name": "Bear Trap",
+            "name": "Spike Trap",
             "weight": 5,
             "min_depth": 0,
             "max_depth": 100
@@ -90,7 +90,31 @@
         {
             "name": "Kobold",
             "weight": 15,
-            "min_depth": 0,
+            "min_depth": 3,
+            "max_depth": 3
+        },
+        {
+            "name": "Rat",
+            "weight": 15,
+            "min_depth": 2,
+            "max_depth": 3
+        },
+        {
+            "name": "Mangy Wolf",
+            "weight": 13,
+            "min_depth": 2,
+            "max_depth": 3
+        },
+        {
+            "name": "Fox",
+            "weight": 15,
+            "min_depth": 2,
+            "max_depth": 3
+        },
+        {
+            "name": "Deer",
+            "weight": 14,
+            "min_depth": 2,
             "max_depth": 3
         }
     ],
@@ -704,6 +728,66 @@
             ]
         },
         {
+            "name": "Deer",
+            "renderable": {
+                "glyph": "d",
+                "fg": "#FFFF00",
+                "bg": "#000000",
+                "order": 1
+            },
+            "blocks_tile": true,
+            "vision_range": 8,
+            "ai": "bystander",
+            "attributes": {
+                "Might": 3,
+                "Fitness": 3
+            },
+            "skills": {
+                "Melee": -1,
+                "Defense": -1
+            },
+            "natural": {
+                "armor_class": 11,
+                "attacks": [
+                    {
+                        "name": "bite",
+                        "hit_bonus": 0,
+                        "damage": "1d4"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Fox",
+            "renderable": {
+                "glyph": "f",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 1
+            },
+            "blocks_tile": true,
+            "vision_range": 8,
+            "ai": "melee",
+            "attributes": {
+                "Might": 3,
+                "Fitness": 3
+            },
+            "skills": {
+                "Melee": -1,
+                "Defense": -1
+            },
+            "natural": {
+                "armor_class": 11,
+                "attacks": [
+                    {
+                        "name": "bite",
+                        "hit_bonus": 0,
+                        "damage": "1d4"
+                    }
+                ]
+            }
+        },
+        {
             "name": "Rat",
             "renderable": {
                 "glyph": "r",
@@ -729,6 +813,36 @@
                         "name": "bite",
                         "hit_bonus": 0,
                         "damage": "1d4"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mangy Wolf",
+            "renderable": {
+                "glyph": "w",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 1
+            },
+            "blocks_tile": true,
+            "vision_range": 8,
+            "ai": "melee",
+            "attributes": {
+                "Might": 3,
+                "Fitness": 3
+            },
+            "skills": {
+                "Melee": -1,
+                "Defense": -1
+            },
+            "natural": {
+                "armor_class": 12,
+                "attacks": [
+                    {
+                        "name": "bite",
+                        "hit_bonus": 0,
+                        "damage": "1d6"
                     }
                 ]
             }
