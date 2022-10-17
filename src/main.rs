@@ -5,6 +5,8 @@ use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 #[macro_use]
 extern crate lazy_static;
 
+mod animal_ai_system;
+use animal_ai_system::*;
 mod components;
 pub use components::*;
 mod map;
@@ -298,6 +300,8 @@ impl State {
         vis.run_now(&self.ecs);
         let mut mob = MonsterAI {};
         mob.run_now(&self.ecs);
+        let mut animals = AnimalAI {};
+        animals.run_now(&self.ecs);
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
         let mut bystander = bystander_ai_system::BystanderAI {};
@@ -520,6 +524,9 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Pools>();
     gs.ecs.register::<Wearable>();
     gs.ecs.register::<NaturalAttackDefense>();
+    gs.ecs.register::<LootTable>();
+    gs.ecs.register::<Carnivore>();
+    gs.ecs.register::<Herbivore>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 

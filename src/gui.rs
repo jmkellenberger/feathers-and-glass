@@ -733,7 +733,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
     let save_exists = super::saveload_system::does_save_exist();
     let runstate = gs.ecs.fetch::<RunState>();
     let assets = gs.ecs.fetch::<RexAssets>();
-    ctx.render_xp_sprite(&assets.main_menu, 0, 0);
+    ctx.render_xp_sprite(&assets.main_menu, 0, 5);
 
     ctx.print_color(
         2,
@@ -881,7 +881,7 @@ pub enum GameOverResult {
 
 pub fn game_over(gs: &mut State, ctx: &mut Rltk) -> GameOverResult {
     let assets = gs.ecs.fetch::<RexAssets>();
-    ctx.render_xp_sprite(&assets.game_over, 0, 0);
+    ctx.render_xp_sprite(&assets.game_over, 0, 5);
 
     ctx.print_color_centered(
         20,

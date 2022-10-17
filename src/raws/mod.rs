@@ -1,5 +1,7 @@
 mod item_structs;
 use item_structs::*;
+mod loot_structs;
+use loot_structs::*;
 mod mob_structs;
 use mob_structs::*;
 mod prop_structs;
@@ -24,6 +26,7 @@ pub struct Raws {
     pub mobs: Vec<Mob>,
     pub props: Vec<Prop>,
     pub spawn_table: Vec<SpawnTableEntry>,
+    pub loot_tables: Vec<LootTable>,
 }
 
 pub fn load_raws() {
