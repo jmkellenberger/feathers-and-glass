@@ -879,7 +879,7 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "melee",
+            "ai": "carnivore",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
@@ -897,7 +897,8 @@
                         "damage": "1d4"
                     }
                 ]
-            }
+            },
+            "loot_table": "Animal"
         },
         {
             "name": "Rat",
