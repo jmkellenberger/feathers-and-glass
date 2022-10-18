@@ -142,6 +142,19 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
         RGB::named(rltk::BLACK),
     );
 
+    format!("Level:  {}", player_pools.level);
+    ctx.print_color(50, 3, white, black, &player_pools.xp);
+    let xp_level_start = (player_pools.level - 1) * 1000;
+    ctx.draw_bar_horizontal(
+        64,
+        3,
+        14,
+        player_pools.xp - xp_level_start,
+        1000,
+        RGB::named(rltk::GOLD),
+        RGB::named(rltk::BLACK),
+    );
+
     // Attributes
     let attributes = ecs.read_storage::<Attributes>();
     let attr = attributes.get(*player_entity).unwrap();

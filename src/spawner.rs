@@ -91,13 +91,13 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
     spawn_named_entity(
         &RAWS.lock().unwrap(),
         ecs,
-        "Dried Sausage",
+        "Weevil-loaf",
         SpawnType::Carried { by: player },
     );
     spawn_named_entity(
         &RAWS.lock().unwrap(),
         ecs,
-        "Beer",
+        "Muddy Tea",
         SpawnType::Carried { by: player },
     );
     spawn_named_entity(
