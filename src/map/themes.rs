@@ -159,6 +159,10 @@ fn get_forest_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
             glyph = rltk::to_cp437('>');
             fg = RGB::from_f32(0., 1.0, 1.0);
         }
+        TileType::UpStairs => {
+            glyph = rltk::to_cp437('<');
+            fg = RGB::from_f32(0., 1.0, 1.0);
+        }
         _ => {
             glyph = rltk::to_cp437('"');
             fg = RGB::from_f32(0.0, 0.6, 0.0);
