@@ -1,4 +1,4 @@
 /target
 savegame.json
-wasm-build.txt
+wasm-build.sh
 design_doc.md

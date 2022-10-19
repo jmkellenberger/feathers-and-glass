@@ -103,24 +103,42 @@
             "name": "Rat",
             "weight": 15,
             "min_depth": 2,
-            "max_depth": 3
+            "max_depth": 2
         },
         {
             "name": "Mangy Wolf",
             "weight": 13,
             "min_depth": 2,
-            "max_depth": 3
+            "max_depth": 2
         },
         {
             "name": "Pugi Bird",
             "weight": 15,
             "min_depth": 2,
-            "max_depth": 3
+            "max_depth": 2
         },
         {
             "name": "Deer",
             "weight": 14,
             "min_depth": 2,
+            "max_depth": 2
+        },
+        {
+            "name": "Bat",
+            "weight": 15,
+            "min_depth": 3,
+            "max_depth": 3
+        },
+        {
+            "name": "Large Spider",
+            "weight": 3,
+            "min_depth": 3,
+            "max_depth": 3
+        },
+        {
+            "name": "Gelatinous Cube",
+            "weight": 3,
+            "min_depth": 3,
             "max_depth": 3
         }
     ],
@@ -836,7 +854,11 @@
                 "Shield",
                 "Leather Armor",
                 "Leather Boots"
-            ]
+            ],
+            "light": {
+                "range": 6,
+                "color": "#FFFF55"
+            }
         },
         {
             "name": "Deer",
@@ -999,6 +1021,88 @@
             "vision_range": 4,
             "ai": "melee",
             "attributes": {}
+        },
+        {
+            "name": "Bat",
+            "renderable": {
+                "glyph": "b",
+                "fg": "#995555",
+                "bg": "#000000",
+                "order": 1
+            },
+            "blocks_tile": true,
+            "vision_range": 6,
+            "ai": "herbivore",
+            "attributes": {
+                "Might": 3,
+                "Fitness": 3
+            },
+            "skills": {
+                "Melee": -1,
+                "Defense": -1
+            },
+            "natural": {
+                "armor_class": 11,
+                "attacks": [
+                    {
+                        "name": "bite",
+                        "hit_bonus": 0,
+                        "damage": "1d4"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Large Spider",
+            "level": 2,
+            "attributes": {},
+            "renderable": {
+                "glyph": "s",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 1
+            },
+            "blocks_tile": true,
+            "vision_range": 6,
+            "ai": "carnivore",
+            "natural": {
+                "armor_class": 12,
+                "attacks": [
+                    {
+                        "name": "bite",
+                        "hit_bonus": 1,
+                        "damage": "1d12"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Gelatinous Cube",
+            "level": 2,
+            "attributes": {},
+            "renderable": {
+                "glyph": "▄",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 1
+            },
+            "blocks_tile": true,
+            "vision_range": 4,
+            "ai": "carnivore",
+            "natural": {
+                "armor_class": 12,
+                "attacks": [
+                    {
+                        "name": "engulf",
+                        "hit_bonus": 0,
+                        "damage": "1d8"
+                    }
+                ]
+            },
+            "light": {
+                "range": 4,
+                "color": "#550000"
+            }
         }
     ],
     "props": [

@@ -42,8 +42,9 @@ pub mod rex_assets;
 pub mod saveload_system;
 pub mod trigger_system;
 pub use gamesystem::*;
+mod lighting_system;
 
-const SHOW_MAPGEN_VISUALIZER: bool = false;
+const SHOW_MAPGEN_VISUALIZER: bool = true;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -69,6 +70,7 @@ pub enum RunState {
         row: i32,
     },
     MapGeneration,
+    ShowCheatMenu,
 }
 
 pub struct State {
@@ -290,6 +292,18 @@ impl GameState for State {
                     newrunstate = RunState::MagicMapReveal { row: row + 1 };
                 }
             }
+            RunState::ShowCheatMenu => {
+                let result = gui::show_cheat_mode(self, ctx);
+                match result {
+                    gui::CheatMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::CheatMenuResult::NoResponse => {}
+                    gui::CheatMenuResult::TeleportToExit => {
+                        self.goto_level(1);
+                        self.mapgen_next_state = Some(RunState::PreRun);
+                        newrunstate = RunState::MapGeneration;
+                    }
+                }
+            }
         }
 
         {
@@ -330,6 +344,8 @@ impl State {
         hunger.run_now(&self.ecs);
         let mut particles = particle_system::ParticleSpawnSystem {};
         particles.run_now(&self.ecs);
+        let mut lighting = lighting_system::LightingSystem {};
+        lighting.run_now(&self.ecs);
 
         self.ecs.maintain();
     }
@@ -454,6 +470,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Herbivore>();
     gs.ecs.register::<OtherLevelPosition>();
     gs.ecs.register::<DMSerializationHelper>();
+    gs.ecs.register::<LightSource>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 

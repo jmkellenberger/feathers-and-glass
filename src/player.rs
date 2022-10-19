@@ -295,6 +295,8 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::U => return RunState::ShowRemoveItem,
 
             VirtualKeyCode::Escape => return RunState::SaveGame,
+            // Cheating!
+            VirtualKeyCode::Backslash => return RunState::ShowCheatMenu,
 
             _ => return RunState::AwaitingInput,
         },
