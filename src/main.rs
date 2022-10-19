@@ -469,6 +469,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<LightSource>();
     gs.ecs.register::<Initiative>();
     gs.ecs.register::<MyTurn>();
+    gs.ecs.register::<Faction>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 

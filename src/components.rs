@@ -328,3 +328,8 @@ pub struct Initiative {
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct MyTurn {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Faction {
+    pub name: String,
+}

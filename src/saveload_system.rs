@@ -109,7 +109,8 @@ pub fn save_game(ecs: &mut World) {
             DMSerializationHelper,
             LightSource,
             Initiative,
-            MyTurn
+            MyTurn,
+            Faction
         );
     }
 
@@ -213,7 +214,8 @@ pub fn load_game(ecs: &mut World) {
             DMSerializationHelper,
             LightSource,
             Initiative,
-            MyTurn
+            MyTurn,
+            Faction
         );
     }
 

@@ -1,4 +1,46 @@
 {
+    "faction_table": [
+        {
+            "name": "Player",
+            "responses": {}
+        },
+        {
+            "name": "Mindless",
+            "responses": {
+                "Default": "attack"
+            }
+        },
+        {
+            "name": "Townsfolk",
+            "responses": {
+                "Default": "ignore"
+            }
+        },
+        {
+            "name": "Bandits",
+            "responses": {
+                "Default": "attack"
+            }
+        },
+        {
+            "name": "Cave Goblins",
+            "responses": {
+                "Default": "attack"
+            }
+        },
+        {
+            "name": "Carnivores",
+            "responses": {
+                "Default": "attack"
+            }
+        },
+        {
+            "name": "Herbivores",
+            "responses": {
+                "Default": "flee"
+            }
+        }
+    ],
     "spawn_table": [
         {
             "name": "Bandit",
@@ -531,6 +573,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "vendor",
+            "faction": "Townsfolk",
             "attributes": {
                 "intelligence": 13
             },
@@ -555,6 +598,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "vendor",
+            "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
                 "Cudgel",
@@ -574,6 +618,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "That scholar is up to no good with the God's Eye.",
                 "I must tell you about my portentous dream.",
@@ -598,6 +643,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
                 "Cudgel",
@@ -620,6 +666,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "Great to see a new face here!",
                 "Tonight's lecture should be a good one.",
@@ -644,6 +691,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "vendor",
+            "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
                 "Cudgel",
@@ -663,6 +711,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "vendor",
+            "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
                 "Cudgel",
@@ -682,6 +731,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "vendor",
+            "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
                 "Cudgel",
@@ -701,6 +751,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "Keep an eye out for texts in the ruins.",
                 "Try not to break everything you come across.",
@@ -725,6 +776,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "Ugh, more competition?",
                 "Stay out of my territory.",
@@ -749,6 +801,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "You hear about the squid-men off the coast?",
                 "The water might look nice, but don't fall in."
@@ -772,6 +825,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "They're biting today!",
                 "I caught something, but it wasn't a fish!",
@@ -796,6 +850,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "Arrr",
                 "Grog!",
@@ -820,6 +875,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "bystander",
+            "faction": "Townsfolk",
             "quips": [
                 "Hic",
                 "Need... more... booze!",
@@ -844,6 +900,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "melee",
+            "faction": "Bandits",
             "quips": [
                 "Stand and deliver!",
                 "Alright, hand it over"
@@ -871,6 +928,7 @@
             "blocks_tile": true,
             "vision_range": 8,
             "ai": "herbivore",
+            "faction": "Herbivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
@@ -902,6 +960,7 @@
             "blocks_tile": true,
             "vision_range": 8,
             "ai": "carnivore",
+            "faction": "Carnivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
@@ -933,6 +992,7 @@
             "blocks_tile": true,
             "vision_range": 8,
             "ai": "melee",
+            "faction": "Carnivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
@@ -963,6 +1023,7 @@
             "blocks_tile": true,
             "vision_range": 8,
             "ai": "carnivore",
+            "faction": "Carnivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
@@ -994,6 +1055,7 @@
             "blocks_tile": true,
             "vision_range": 8,
             "ai": "melee",
+            "faction": "Mindless",
             "attributes": {}
         },
         {
@@ -1007,6 +1069,7 @@
             "blocks_tile": true,
             "vision_range": 8,
             "ai": "melee",
+            "faction": "Cave Monsters",
             "attributes": {}
         },
         {
@@ -1020,6 +1083,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "melee",
+            "faction": "Cave Monsters",
             "attributes": {}
         },
         {
@@ -1033,6 +1097,7 @@
             "blocks_tile": true,
             "vision_range": 6,
             "ai": "herbivore",
+            "faction": "Herbivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
@@ -1065,6 +1130,7 @@
             "blocks_tile": true,
             "vision_range": 6,
             "ai": "carnivore",
+            "faction": "Carnivores",
             "natural": {
                 "armor_class": 12,
                 "attacks": [
@@ -1089,6 +1155,7 @@
             "blocks_tile": true,
             "vision_range": 4,
             "ai": "carnivore",
+            "faction": "Mindless",
             "natural": {
                 "armor_class": 12,
                 "attacks": [
