@@ -5,8 +5,7 @@ use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 #[macro_use]
 extern crate lazy_static;
 
-mod animal_ai_system;
-use animal_ai_system::*;
+mod ai;
 mod components;
 pub use components::*;
 mod map;
@@ -17,8 +16,6 @@ mod rect;
 pub use rect::Rect;
 mod visibility_system;
 use visibility_system::VisibilitySystem;
-mod monster_ai_system;
-use monster_ai_system::MonsterAI;
 mod map_indexing_system;
 use map_indexing_system::MapIndexingSystem;
 mod melee_combat_system;
@@ -31,7 +28,6 @@ mod gui;
 mod inventory_system;
 mod spawner;
 use inventory_system::{ItemCollectionSystem, ItemDropSystem, ItemRemoveSystem, ItemUseSystem};
-pub mod bystander_ai_system;
 pub mod camera;
 pub mod hunger_system;
 pub mod map_builders;
@@ -318,13 +314,13 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
-        let mut mob = MonsterAI {};
+        let mut mob = ai::MonsterAI {};
         mob.run_now(&self.ecs);
-        let mut animals = AnimalAI {};
+        let mut animals = ai::AnimalAI {};
         animals.run_now(&self.ecs);
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
-        let mut bystander = bystander_ai_system::BystanderAI {};
+        let mut bystander = ai::BystanderAI {};
         bystander.run_now(&self.ecs);
         let mut triggers = trigger_system::TriggerSystem {};
         triggers.run_now(&self.ecs);

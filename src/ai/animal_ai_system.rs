@@ -1,4 +1,4 @@
-use super::{
+use crate::{
     Carnivore, EntityMoved, Herbivore, Item, Map, Position, RunState, Viewshed, WantsToMelee,
 };
 use rltk::Point;

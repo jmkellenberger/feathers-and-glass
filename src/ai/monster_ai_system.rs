@@ -1,4 +1,4 @@
-use super::{
+use crate::{
     particle_system::ParticleBuilder, Confusion, EntityMoved, Map, Monster, Position, RunState,
     Viewshed, WantsToMelee,
 };

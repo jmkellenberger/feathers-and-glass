@@ -1,4 +1,4 @@
-use super::{
+use crate::{
     gamelog::GameLog, Bystander, EntityMoved, Map, Name, Position, Quips, RunState, Viewshed,
 };
 use rltk::Point;
