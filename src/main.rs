@@ -7,6 +7,7 @@ extern crate lazy_static;
 
 mod ai;
 mod components;
+mod spatial;
 pub use components::*;
 mod map;
 pub use map::*;

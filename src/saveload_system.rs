@@ -1,4 +1,5 @@
 use super::components::*;
+#[allow(deprecated)]
 use specs::error::NoError;
 use specs::prelude::*;
 use specs::saveload::{
@@ -11,6 +12,7 @@ use std::path::Path;
 macro_rules! serialize_individually {
     ($ecs:expr, $ser:expr, $data:expr, $( $type:ty),*) => {
         $(
+        #[allow(deprecated)]
         SerializeComponents::<NoError, SimpleMarker<SerializeMe>>::serialize(
             &( $ecs.read_storage::<$type>(), ),
             &$data.0,
@@ -125,6 +127,7 @@ pub fn does_save_exist() -> bool {
 macro_rules! deserialize_individually {
     ($ecs:expr, $de:expr, $data:expr, $( $type:ty),*) => {
         $(
+        #[allow(deprecated)]
         DeserializeComponents::<NoError, _>::deserialize(
             &mut ( &mut $ecs.write_storage::<$type>(), ),
             &$data.0, // entities
@@ -228,7 +231,7 @@ pub fn load_game(ecs: &mut World) {
         for (e, h) in (&entities, &helper).join() {
             let mut worldmap = ecs.write_resource::<super::map::Map>();
             *worldmap = h.map.clone();
-            worldmap.tile_content = vec![Vec::new(); (worldmap.height * worldmap.width) as usize];
+            crate::spatial::set_size((worldmap.height * worldmap.width) as usize);
             deleteme = Some(e);
         }
         for (e, h) in (&entities, &helper2).join() {
