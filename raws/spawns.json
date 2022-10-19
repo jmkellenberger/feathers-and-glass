@@ -13,31 +13,44 @@
         {
             "name": "Townsfolk",
             "responses": {
-                "Default": "ignore"
+                "Default": "flee",
+                "Player": "ignore",
+                "Townsfolk": "ignore"
             }
         },
         {
             "name": "Bandits",
             "responses": {
-                "Default": "attack"
+                "Default": "attack",
+                "Bandits": "ignore"
             }
         },
         {
-            "name": "Cave Goblins",
+            "name": "Cave Monsters",
             "responses": {
-                "Default": "attack"
+                "Default": "attack",
+                "Cave Goblins": "ignore"
             }
         },
         {
             "name": "Carnivores",
             "responses": {
-                "Default": "attack"
+                "Default": "attack",
+                "Carnivores": "ignore"
             }
         },
         {
             "name": "Herbivores",
             "responses": {
-                "Default": "flee"
+                "Default": "flee",
+                "Herbivores": "ignore"
+            }
+        },
+        {
+            "name": "Hungry Rodents",
+            "responses": {
+                "Default": "attack",
+                "Hungry Rodents": "ignore"
             }
         }
     ],
@@ -349,7 +362,7 @@
                 "order": 2
             },
             "weapon": {
-                "range": "melee",
+                "range": "static",
                 "attribute": "Might",
                 "base_damage": "1d8-1",
                 "hit_bonus": -1
@@ -364,7 +377,7 @@
                 "order": 2
             },
             "weapon": {
-                "range": "melee",
+                "range": "static",
                 "attribute": "Quickness",
                 "base_damage": "1d4",
                 "hit_bonus": 0
@@ -379,7 +392,7 @@
                 "order": 2
             },
             "weapon": {
-                "range": "melee",
+                "range": "static",
                 "attribute": "Might",
                 "base_damage": "1d8",
                 "hit_bonus": 0
@@ -394,7 +407,7 @@
                 "order": 2
             },
             "weapon": {
-                "range": "melee",
+                "range": "static",
                 "attribute": "Might",
                 "base_damage": "1d8+1",
                 "hit_bonus": 0
@@ -474,7 +487,7 @@
                 "order": 2
             },
             "weapon": {
-                "range": "melee",
+                "range": "static",
                 "attribute": "Quickness",
                 "base_damage": "1d4",
                 "hit_bonus": 0
@@ -528,7 +541,7 @@
                 "order": 2
             },
             "weapon": {
-                "range": "melee",
+                "range": "static",
                 "attribute": "Might",
                 "base_damage": "1d6",
                 "hit_bonus": 0
@@ -572,13 +585,13 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "vendor",
+            "movement": "static",
             "faction": "Townsfolk",
             "attributes": {
                 "intelligence": 13
             },
             "skills": {
-                "Melee": 2
+                "static": 2
             },
             "equipped": [
                 "Cudgel",
@@ -597,7 +610,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "vendor",
+            "movement": "static",
             "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
@@ -617,7 +630,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "random",
             "faction": "Townsfolk",
             "quips": [
                 "That scholar is up to no good with the God's Eye.",
@@ -642,7 +655,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
@@ -665,7 +678,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "quips": [
                 "Great to see a new face here!",
@@ -690,7 +703,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "vendor",
+            "movement": "static",
             "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
@@ -710,7 +723,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "vendor",
+            "movement": "static",
             "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
@@ -730,7 +743,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "vendor",
+            "movement": "static",
             "faction": "Townsfolk",
             "attributes": {},
             "equipped": [
@@ -750,7 +763,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "quips": [
                 "Keep an eye out for texts in the ruins.",
@@ -775,7 +788,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "quips": [
                 "Ugh, more competition?",
@@ -800,7 +813,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "quips": [
                 "You hear about the squid-men off the coast?",
@@ -824,7 +837,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "quips": [
                 "They're biting today!",
@@ -849,7 +862,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "static",
             "faction": "Townsfolk",
             "quips": [
                 "Arrr",
@@ -874,7 +887,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "bystander",
+            "movement": "random",
             "faction": "Townsfolk",
             "quips": [
                 "Hic",
@@ -899,7 +912,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "melee",
+            "movement": "static",
             "faction": "Bandits",
             "quips": [
                 "Stand and deliver!",
@@ -927,14 +940,14 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "herbivore",
+            "movement": "random",
             "faction": "Herbivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
             },
             "skills": {
-                "Melee": -1,
+                "static": -1,
                 "Defense": -1
             },
             "natural": {
@@ -959,14 +972,14 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "carnivore",
+            "movement": "static",
             "faction": "Carnivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
             },
             "skills": {
-                "Melee": -1,
+                "static": -1,
                 "Defense": -1
             },
             "natural": {
@@ -991,14 +1004,14 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "melee",
-            "faction": "Carnivores",
+            "movement": "static",
+            "faction": "Hungry Rodents",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
             },
             "skills": {
-                "Melee": -1,
+                "static": -1,
                 "Defense": -1
             },
             "natural": {
@@ -1022,14 +1035,14 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "carnivore",
+            "movement": "static",
             "faction": "Carnivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
             },
             "skills": {
-                "Melee": -1,
+                "static": -1,
                 "Defense": -1
             },
             "natural": {
@@ -1054,7 +1067,7 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "melee",
+            "movement": "static",
             "faction": "Mindless",
             "attributes": {}
         },
@@ -1068,7 +1081,7 @@
             },
             "blocks_tile": true,
             "vision_range": 8,
-            "ai": "melee",
+            "movement": "static",
             "faction": "Cave Monsters",
             "attributes": {}
         },
@@ -1082,7 +1095,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "melee",
+            "movement": "static",
             "faction": "Cave Monsters",
             "attributes": {}
         },
@@ -1096,14 +1109,14 @@
             },
             "blocks_tile": true,
             "vision_range": 6,
-            "ai": "herbivore",
+            "movement": "random",
             "faction": "Herbivores",
             "attributes": {
                 "Might": 3,
                 "Fitness": 3
             },
             "skills": {
-                "Melee": -1,
+                "static": -1,
                 "Defense": -1
             },
             "natural": {
@@ -1129,7 +1142,7 @@
             },
             "blocks_tile": true,
             "vision_range": 6,
-            "ai": "carnivore",
+            "movement": "static",
             "faction": "Carnivores",
             "natural": {
                 "armor_class": 12,
@@ -1154,7 +1167,7 @@
             },
             "blocks_tile": true,
             "vision_range": 4,
-            "ai": "carnivore",
+            "movement": "static",
             "faction": "Mindless",
             "natural": {
                 "armor_class": 12,

@@ -9,7 +9,8 @@ use prop_structs::*;
 mod spawn_table_structs;
 use spawn_table_structs::*;
 mod faction_structs;
-use faction_structs::*;
+use faction_structs::FactionInfo;
+pub use faction_structs::Reaction;
 
 mod rawmaster;
 pub use rawmaster::*;

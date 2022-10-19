@@ -63,7 +63,6 @@ pub fn save_game(ecs: &mut World) {
             Renderable,
             Player,
             Viewshed,
-            Monster,
             Name,
             BlocksTile,
             SufferDamage,
@@ -95,22 +94,22 @@ pub fn save_game(ecs: &mut World) {
             SingleActivation,
             BlocksVisibility,
             Door,
-            Bystander,
-            Vendor,
             Quips,
             Attributes,
             Skills,
             Pools,
             NaturalAttackDefense,
             LootTable,
-            Carnivore,
-            Herbivore,
             OtherLevelPosition,
             DMSerializationHelper,
             LightSource,
             Initiative,
             MyTurn,
-            Faction
+            Faction,
+            WantsToApproach,
+            WantsToFlee,
+            MoveMode,
+            Chasing
         );
     }
 
@@ -168,7 +167,6 @@ pub fn load_game(ecs: &mut World) {
             Renderable,
             Player,
             Viewshed,
-            Monster,
             Name,
             BlocksTile,
             SufferDamage,
@@ -200,22 +198,22 @@ pub fn load_game(ecs: &mut World) {
             SingleActivation,
             BlocksVisibility,
             Door,
-            Bystander,
-            Vendor,
             Quips,
             Attributes,
             Skills,
             Pools,
             NaturalAttackDefense,
             LootTable,
-            Carnivore,
-            Herbivore,
             OtherLevelPosition,
             DMSerializationHelper,
             LightSource,
             Initiative,
             MyTurn,
-            Faction
+            Faction,
+            WantsToApproach,
+            WantsToFlee,
+            MoveMode,
+            Chasing
         );
     }
 

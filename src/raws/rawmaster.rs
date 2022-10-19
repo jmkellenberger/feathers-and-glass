@@ -311,13 +311,22 @@ pub fn spawn_named_mob(
             name: mob_template.name.clone(),
         });
 
-        match mob_template.ai.as_ref() {
-            "melee" => eb = eb.with(Monster {}),
-            "bystander" => eb = eb.with(Bystander {}),
-            "vendor" => eb = eb.with(Vendor {}),
-            "carnivore" => eb = eb.with(Carnivore {}),
-            "herbivore" => eb = eb.with(Herbivore {}),
-            _ => {}
+        match mob_template.movement.as_ref() {
+            "random" => {
+                eb = eb.with(MoveMode {
+                    mode: Movement::Random,
+                })
+            }
+            "random_waypoint" => {
+                eb = eb.with(MoveMode {
+                    mode: Movement::RandomWaypoint { path: None },
+                })
+            }
+            _ => {
+                eb = eb.with(MoveMode {
+                    mode: Movement::Static,
+                })
+            }
         }
 
         if let Some(faction) = &mob_template.faction {
@@ -616,4 +625,18 @@ pub fn get_item_drop(
     }
 
     None
+}
+
+pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster) -> Reaction {
+    if raws.faction_index.contains_key(my_faction) {
+        let mf = &raws.faction_index[my_faction];
+        if mf.contains_key(their_faction) {
+            return mf[their_faction];
+        } else if mf.contains_key("Default") {
+            return mf["Default"];
+        } else {
+            return Reaction::Ignore;
+        }
+    }
+    Reaction::Ignore
 }
