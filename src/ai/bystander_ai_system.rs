@@ -1,7 +1,4 @@
-use crate::{
-    gamelog::GameLog, Bystander, EntityMoved, Map, Name, Position, Quips, RunState, Viewshed,
-};
-use rltk::Point;
+use crate::{Bystander, EntityMoved, Map, MyTurn, Position, Viewshed};
 use specs::prelude::*;
 
 pub struct BystanderAI {}
@@ -10,64 +7,30 @@ impl<'a> System<'a> for BystanderAI {
     #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteExpect<'a, Map>,
-        ReadExpect<'a, RunState>,
         Entities<'a>,
         WriteStorage<'a, Viewshed>,
         ReadStorage<'a, Bystander>,
         WriteStorage<'a, Position>,
         WriteStorage<'a, EntityMoved>,
         WriteExpect<'a, rltk::RandomNumberGenerator>,
-        ReadExpect<'a, Point>,
-        WriteExpect<'a, GameLog>,
-        WriteStorage<'a, Quips>,
-        ReadStorage<'a, Name>,
+        ReadStorage<'a, MyTurn>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
             mut map,
-            runstate,
             entities,
             mut viewshed,
             bystander,
             mut position,
             mut entity_moved,
             mut rng,
-            player_pos,
-            mut gamelog,
-            mut quips,
-            names,
+            turns,
         ) = data;
 
-        if *runstate != RunState::MonsterTurn {
-            return;
-        }
-
-        for (entity, mut viewshed, _bystander, mut pos) in
-            (&entities, &mut viewshed, &bystander, &mut position).join()
+        for (entity, mut viewshed, _bystander, mut pos, _turn) in
+            (&entities, &mut viewshed, &bystander, &mut position, &turns).join()
         {
-            // Possibly quip
-            let quip = quips.get_mut(entity);
-            if let Some(quip) = quip {
-                if !quip.available.is_empty()
-                    && viewshed.visible_tiles.contains(&player_pos)
-                    && rng.roll_dice(1, 6) == 1
-                {
-                    let name = names.get(entity);
-                    let quip_index = if quip.available.len() == 1 {
-                        0
-                    } else {
-                        (rng.roll_dice(1, quip.available.len() as i32) - 1) as usize
-                    };
-                    gamelog.entries.push(format!(
-                        "{} says \"{}\"",
-                        name.unwrap().name,
-                        quip.available[quip_index]
-                    ));
-                    quip.available.remove(quip_index);
-                }
-            }
-
             // Try to move randomly
             let mut x = pos.x;
             let mut y = pos.y;

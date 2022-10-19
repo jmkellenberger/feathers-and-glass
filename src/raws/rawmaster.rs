@@ -443,6 +443,9 @@ pub fn spawn_named_mob(
             eb = eb.with(nature);
         }
 
+        // Initiative of 2
+        eb = eb.with(Initiative { current: 2 });
+
         if let Some(loot) = &mob_template.loot_table {
             eb = eb.with(LootTable {
                 table: loot.clone(),

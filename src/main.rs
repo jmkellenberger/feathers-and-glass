@@ -46,8 +46,7 @@ const SHOW_MAPGEN_VISUALIZER: bool = true;
 pub enum RunState {
     AwaitingInput,
     PreRun,
-    PlayerTurn,
-    MonsterTurn,
+    Ticking,
     ShowInventory,
     ShowDropItem,
     ShowTargeting {
@@ -68,7 +67,6 @@ pub enum RunState {
     MapGeneration,
     ShowCheatMenu,
 }
-
 pub struct State {
     pub ecs: World,
     mapgen_next_state: Option<RunState>,
@@ -125,20 +123,16 @@ impl GameState for State {
             RunState::AwaitingInput => {
                 newrunstate = player_input(self, ctx);
             }
-            RunState::PlayerTurn => {
+            RunState::Ticking => {
                 self.run_systems();
                 self.ecs.maintain();
                 match *self.ecs.fetch::<RunState>() {
+                    RunState::AwaitingInput => newrunstate = RunState::AwaitingInput,
                     RunState::MagicMapReveal { .. } => {
                         newrunstate = RunState::MagicMapReveal { row: 0 }
                     }
-                    _ => newrunstate = RunState::MonsterTurn,
+                    _ => newrunstate = RunState::Ticking,
                 }
-            }
-            RunState::MonsterTurn => {
-                self.run_systems();
-                self.ecs.maintain();
-                newrunstate = RunState::AwaitingInput;
             }
             RunState::ShowInventory => {
                 let result = gui::show_inventory(self, ctx);
@@ -165,7 +159,7 @@ impl GameState for State {
                                     },
                                 )
                                 .expect("Unable to insert intent");
-                            newrunstate = RunState::PlayerTurn;
+                            newrunstate = RunState::Ticking;
                         }
                     }
                 }
@@ -184,7 +178,7 @@ impl GameState for State {
                                 WantsToDropItem { item: item_entity },
                             )
                             .expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+                        newrunstate = RunState::Ticking;
                     }
                 }
             }
@@ -202,7 +196,7 @@ impl GameState for State {
                                 WantsToRemoveItem { item: item_entity },
                             )
                             .expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+                        newrunstate = RunState::Ticking;
                     }
                 }
             }
@@ -222,7 +216,7 @@ impl GameState for State {
                                 },
                             )
                             .expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+                        newrunstate = RunState::Ticking;
                     }
                 }
             }
@@ -283,7 +277,7 @@ impl GameState for State {
                     map.revealed_tiles[idx] = true;
                 }
                 if row == map.height - 1 {
-                    newrunstate = RunState::MonsterTurn;
+                    newrunstate = RunState::Ticking;
                 } else {
                     newrunstate = RunState::MagicMapReveal { row: row + 1 };
                 }
@@ -312,14 +306,20 @@ impl GameState for State {
 
 impl State {
     fn run_systems(&mut self) {
+        let mut mapindex = MapIndexingSystem {};
+        mapindex.run_now(&self.ecs);
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
+        let mut initiative = ai::InitiativeSystem {};
+        initiative.run_now(&self.ecs);
+        let mut turnstatus = ai::TurnStatusSystem {};
+        turnstatus.run_now(&self.ecs);
+        let mut quipper = ai::QuipSystem {};
+        quipper.run_now(&self.ecs);
         let mut mob = ai::MonsterAI {};
         mob.run_now(&self.ecs);
         let mut animals = ai::AnimalAI {};
         animals.run_now(&self.ecs);
-        let mut mapindex = MapIndexingSystem {};
-        mapindex.run_now(&self.ecs);
         let mut bystander = ai::BystanderAI {};
         bystander.run_now(&self.ecs);
         let mut triggers = trigger_system::TriggerSystem {};
@@ -467,6 +467,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<OtherLevelPosition>();
     gs.ecs.register::<DMSerializationHelper>();
     gs.ecs.register::<LightSource>();
+    gs.ecs.register::<Initiative>();
+    gs.ecs.register::<MyTurn>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
