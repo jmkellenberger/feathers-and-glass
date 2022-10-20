@@ -211,7 +211,11 @@ pub fn spawn_named_item(
             name: item_template.name.clone(),
         });
 
-        eb = eb.with(crate::components::Item {});
+        eb = eb.with(crate::components::Item {
+            initiative_penalty: item_template.initiative_penalty.unwrap_or(0.0),
+            weight_lbs: item_template.weight_lbs.unwrap_or(0.0),
+            base_value: item_template.base_value.unwrap_or(0.0),
+        });
 
         if let Some(consumable) = &item_template.consumable {
             eb = eb.with(crate::components::Consumable {});
@@ -424,7 +428,17 @@ pub fn spawn_named_mob(
                 current: mob_mana,
                 max: mob_mana,
             },
+            total_weight: 0.0,
+            total_initiative_penalty: 0.0,
+            gold: if let Some(gold) = &mob_template.gold {
+                let mut rng = rltk::RandomNumberGenerator::new();
+                let (n, d, b) = parse_dice_string(&gold);
+                (rng.roll_dice(n, d) + b) as f32
+            } else {
+                0.0
+            },
         };
+
         eb = eb.with(pools);
 
         let mut skills = Skills {
@@ -493,6 +507,14 @@ pub fn spawn_named_mob(
             eb = eb.with(LightSource {
                 range: light.range,
                 color: rltk::RGB::from_hex(&light.color).expect("Bad color"),
+            });
+        }
+
+        eb = eb.with(EquipmentChanged {});
+
+        if let Some(vendor) = &mob_template.vendor {
+            eb = eb.with(Vendor {
+                categories: vendor.clone(),
             });
         }
 
@@ -639,4 +661,18 @@ pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster)
         }
     }
     Reaction::Ignore
+}
+
+pub fn get_vendor_items(categories: &[String], raws: &RawMaster) -> Vec<(String, f32)> {
+    let mut result: Vec<(String, f32)> = Vec::new();
+
+    for item in raws.raws.items.iter() {
+        if let Some(cat) = &item.vendor_category {
+            if categories.contains(cat) && item.base_value.is_some() {
+                result.push((item.name.clone(), item.base_value.unwrap()));
+            }
+        }
+    }
+
+    result
 }

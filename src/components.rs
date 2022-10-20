@@ -51,6 +51,9 @@ pub struct Pools {
     pub mana: Pool,
     pub xp: i32,
     pub level: i32,
+    pub total_weight: f32,
+    pub total_initiative_penalty: f32,
+    pub gold: f32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -108,7 +111,11 @@ impl SufferDamage {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Item {}
+pub struct Item {
+    pub initiative_penalty: f32,
+    pub weight_lbs: f32,
+    pub base_value: f32,
+}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Consumable {}
@@ -345,4 +352,12 @@ pub struct MoveMode {
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Chasing {
     pub target: Entity,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct EquipmentChanged {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Vendor {
+    pub categories: Vec<String>,
 }
